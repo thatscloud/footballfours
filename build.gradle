@@ -1,0 +1,26 @@
+plugins {
+  id 'java'
+  id 'application'
+  id 'com.github.johnrengelman.shadow' version '1.2.2'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.13'
+    compile 'com.sparkjava:spark-core:2.3'
+    compile 'com.h2database:h2:1.4.190'
+    compile 'commons-io:commons-io:2.4'
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'com.github.jknack:handlebars:4.0.3'
+    compile 'org.apache.commons:commons-csv:1.2'
+    testCompile 'org.testng:testng:6.9.10'
+}
+
+test {
+    useTestNG()
+}
+
+mainClassName = "com.footballfours.Main"

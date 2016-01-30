@@ -1,0 +1,120 @@
+﻿body {
+  background-color: #FFFFFF;
+  color: #333333;
+}
+
+body > .section:first-child {
+  padding-top: 10%;
+}
+
+body > .section:last-child {
+  padding-bottom: 10%;
+}
+    
+.matchTime {
+  float: right;
+}
+
+.matchDateAndTime {
+  padding-top: 5%;
+}
+
+.rescheduled.matchDateAndTime {
+  color: red;
+}
+
+.section:nth-child(2n + 1) .rescheduled.matchDateAndTime {
+  color: #B00;
+}
+
+/* Tablet */
+@media (max-width: 750px) {
+  .matchDateAndTime {
+    padding-top: 30px;
+  }
+}
+
+.homeTeam, .awayTeam, .matchScore {
+  text-align: center;
+}
+
+.homeTeam {
+  background-color: #EEEEFF;
+}
+
+.awayTeam {
+  background-color: #FFEEEE;
+}
+
+.homeTeam > div:first-child,
+.awayTeam > div:first-child,
+.matchScore {
+  font-size: 20px;
+}
+
+.scorer {
+  font-size: 12px;
+}
+
+.section {
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
+.section:nth-child(2n + 1) {
+  background-color: #777777;
+  color: #F7F7F7;
+}
+
+.section:first-child {
+  background-color: #333333;
+  color: #F7F7F7;
+}
+
+.section:nth-child(2n + 1) .homeTeam {
+  background-color: #777788;
+}
+
+.section:nth-child(2n + 1) .awayTeam {
+  background-color: #887777;
+}
+
+.nav {
+  text-align: center;
+}
+
+.section-heading {
+  text-align: center;
+}
+
+.section-description {
+  text-align: center;
+  max-width: 40%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Mobile */
+@media (max-width: 400px) {
+  .leaguetable td,
+  .leaguetable th  {
+    padding: 1px;
+  }
+}
+
+/* Phablet */
+@media (max-width: 550px) {
+  .leaguetable td,
+  .leaguetable th  {
+    padding: 2px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 750px) {
+  .leaguetable td,
+  .leaguetable th  {
+    padding: 4px;
+  }
+}
+
