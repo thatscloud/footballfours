@@ -26,9 +26,9 @@ FROM
     goalsAgainst
     FROM
     team t
-    INNER JOIN match_team mt ON
+    LEFT OUTER JOIN match_team mt ON
     mt.id_team = t.id_team
-    INNER JOIN match m ON
+    LEFT OUTER JOIN match m ON
     mt.id_match = m.id_match
     LEFT OUTER JOIN
     (
@@ -72,7 +72,7 @@ FROM
         ON m.id_match = awayMatchId
     )
     ON m.id_match = matchId
-    INNER JOIN
+    LEFT OUTER JOIN
     (
         SELECT
             t.id_team AS goalsForTeamId,
@@ -92,7 +92,7 @@ FROM
         GROUP BY t.id_team
     )
     ON t.id_team = goalsForTeamId
-    INNER JOIN
+    LEFT OUTER JOIN
     (
         SELECT
             t.id_team AS goalsAgainstTeamId,
@@ -115,7 +115,7 @@ FROM
         GROUP BY t.id_team
     )
     ON t.id_team = goalsAgainstTeamId
-    INNER JOIN
+    LEFT OUTER JOIN
     (
         SELECT
             t.id_team AS matchesPlayedTeamId,
@@ -133,7 +133,7 @@ FROM
         GROUP BY t.id_team
     )
     ON t.id_team = matchesPlayedTeamId
-    WHERE m.cd_status = 'COMPLETED'
+    WHERE m.cd_status = 'COMPLETED' OR m.cd_status IS NULL
     GROUP BY t.nm_team, goalsFor, goalsAgainst
 )
 ORDER BY points DESC, goalDifference DESC, goalsFor DESC, teamName ASC

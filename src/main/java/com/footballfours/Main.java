@@ -18,10 +18,11 @@ import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.footballfours.model.fixture.builder.FixturesModelBuilder;
+import com.footballfours.model.table.builder.TablesModelBuilder;
 import com.footballfours.persist.init.DatabaseInitialiser;
-import com.footballfours.route.FixturesRoute;
+import com.footballfours.route.HandlebarsRouteFactory;
 import com.footballfours.route.StaticContentRoute;
-import com.footballfours.route.TablesRoute;
 
 public class Main
 {
@@ -102,6 +103,11 @@ public class Main
         {
             throw new RuntimeException( e );
         }
+
+        final HandlebarsRouteFactory hbRouteFactory =
+            new HandlebarsRouteFactory( "/com/footballfours/template",
+                                        connectionPool );
+
         before( ( req, res ) ->
         {
             res.raw().setCharacterEncoding( StandardCharsets.UTF_8.toString() );
@@ -119,8 +125,14 @@ public class Main
             res.redirect( "/fixtures.html", 302 );
             return res.raw();
         } );
-        get( "/fixtures.html", new FixturesRoute( connectionPool ) );
-        get( "/tables.html", new TablesRoute( connectionPool ) );
+        get( "/fixtures.html",
+             hbRouteFactory.from(
+                 "fixtures",
+                 FixturesModelBuilder::getRoundsFromConnection ) );
+        get( "/tables.html",
+             hbRouteFactory.from(
+                 "tables",
+                 TablesModelBuilder::getTablesFromConnection ) );
         get( "/*", new StaticContentRoute() );
     }
 }
