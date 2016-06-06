@@ -8,11 +8,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flywaydb.core.Flyway;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.Server;
 import org.slf4j.Logger;
@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.footballfours.model.fixture.builder.FixturesModelBuilder;
 import com.footballfours.model.table.builder.TablesModelBuilder;
-import com.footballfours.persist.init.DatabaseInitialiser;
 import com.footballfours.route.HandlebarsRouteFactory;
 import com.footballfours.route.StaticContentRoute;
 
@@ -62,23 +61,11 @@ public class Main
             "jdbc:h2:./footballfours;CIPHER=AES",
             sqlUsername,
             encryptionPassword + " " + sqlPassword );
-        try( final Connection connection = connectionPool.getConnection() )
-        {
-            if( DatabaseInitialiser.needsInitialising( connection ) )
-            {
-                theLogger.info( "DB needs initialising" );
-                DatabaseInitialiser.initialise( connection );
-                theLogger.info( "DB initialised" );
-            }
-            else
-            {
-                theLogger.info( "Pre-existing DB found" );
-            }
-        }
-        catch( final SQLException e )
-        {
-            throw new RuntimeException( e );
-        }
+        
+        final Flyway flyway = new Flyway();
+        flyway.setDataSource( connectionPool );
+        flyway.setLocations( "classpath:com/footballfours/persist/migration" );
+        flyway.migrate();
 
         try
         {

@@ -16,6 +16,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'com.github.jknack:handlebars:4.0.3'
     compile 'org.apache.commons:commons-csv:1.2'
+    compile 'org.flywaydb:flyway-core:4.0.1'
     testCompile 'org.testng:testng:6.9.10'
 }
 
