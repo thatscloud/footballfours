@@ -111,6 +111,10 @@ public class Main
         {
             throw new RuntimeException( e );
         }
+        
+        // New Rest Routes
+        RouteManager.insertRoutes( connectionSource );
+        InjectManager.prepareInjections( connectionSource );
 
         // Old Handlbars routes
         before( ( req, res ) -> {
@@ -124,18 +128,12 @@ public class Main
                 res.raw().setContentType( "text/css; charset=utf-8" );
             }
         } );
-        get( "/", ( req, res ) -> {
-            res.redirect( "/fixtures.html", 302 );
-            return res.raw();
-        } );
         get( "/fixtures.html", hbRouteFactory.from( "fixtures",
             FixturesModelBuilder::getRoundsFromConnection ) );
         get( "/tables.html", hbRouteFactory.from( "tables",
             TablesModelBuilder::getTablesFromConnection ) );
         get( "/*", new StaticContentRoute( connectionSource ) );
 
-        // New Rest Routes
-        RouteManager.insertRoutes( connectionSource );
-        InjectManager.prepareInjections( connectionSource );
+        
     }
 }

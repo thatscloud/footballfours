@@ -8,6 +8,7 @@ import spark.Response;
 import spark.Route;
 
 import com.footballfours.core.JsonTransformer;
+import com.footballfours.core.user.User;
 import com.j256.ormlite.support.ConnectionSource;
 
 public abstract class RegistrableRoute implements Route
@@ -49,6 +50,7 @@ public abstract class RegistrableRoute implements Route
     protected Map<String, Object> getNewPageModel( Request request )
     {
         Map<String, Object> page = new HashMap<>();
+        page.put( "user", request.session( ).attribute( "user" ) );
         return page;
     }
 

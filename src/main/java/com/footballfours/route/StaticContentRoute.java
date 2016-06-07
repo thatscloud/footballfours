@@ -43,7 +43,7 @@ public class StaticContentRoute extends RegistrableRoute
         boolean notFound = true;
         String fullResourceAddress="";
         List<String> resourcePaths = Arrays.asList( new String[] {
-                "com/rocketcomp/staticcontent/", "com/rocketcomp/ng/" } );
+                "com/footballfours/staticcontent/", "com/footballfours/ng/" } );
         for ( String resourcePath : resourcePaths )
         {
             fullResourceAddress = resourcePath + uriString;
@@ -71,7 +71,7 @@ public class StaticContentRoute extends RegistrableRoute
 
         if ( notFound )
         {
-            fullResourceAddress = "com/rocketcomp/staticcontent/404.html";
+            fullResourceAddress = "com/footballfours/staticcontent/404.html";
         }
 
         try (final InputStream in = getClass().getClassLoader().getResourceAsStream(

@@ -25,9 +25,9 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.j256.ormlite.support.ConnectionSource;
 
-public class FixturesRestRoute extends RegistrableRoute
+public class RoundsRestRoute extends RegistrableRoute
 {
-    public FixturesRestRoute( final ConnectionSource connectionSource )
+    public RoundsRestRoute( final ConnectionSource connectionSource )
     {
         super( connectionSource );
     }
@@ -35,24 +35,24 @@ public class FixturesRestRoute extends RegistrableRoute
     @Override
     public void register()
     {
-        get( "/fixtures", "application/json", ( request, response ) -> {
+        get( "/rounds", "application/json", ( request, response ) -> {
             Map<String, Object> page = getNewPageModel( request );
             return page;
         }, getJsonTransformer() );
 
-        get( "/fixtures/:fixtureId", "application/json",
+        get( "/rounds/:roundId", "application/json",
             ( request, response ) -> {
                 Map<String, Object> page = getNewPageModel( request );
                 return page;
             }, getJsonTransformer() );
 
-        delete( "/fixtures/:fixtureId", "application/json",
+        delete( "/rounds/:roundId", "application/json",
             ( request, response ) -> {
                 Map<String, Object> page = getNewPageModel( request );
                 return page;
             }, getJsonTransformer() );
 
-        post( "/fixtures", "application/json", ( request, response ) -> {
+        post( "/rounds", "application/json", ( request, response ) -> {
             Map<String, Object> page = getNewPageModel( request );
             return page;
         }, getJsonTransformer() );
