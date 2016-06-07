@@ -35,24 +35,24 @@ public class TablesRestRoute extends RegistrableRoute
     @Override
     public void register()
     {
-        get( "/fixtures", "application/json", ( request, response ) -> {
+        get( "/tables", "application/json", ( request, response ) -> {
             Map<String, Object> page = getNewPageModel( request );
             return page;
         }, getJsonTransformer() );
 
-        get( "/fixtures/:competitionId", "application/json",
+        get( "/tables/:tableId", "application/json",
             ( request, response ) -> {
                 Map<String, Object> page = getNewPageModel( request );
                 return page;
             }, getJsonTransformer() );
 
-        delete( "/fixtures/:competitionId", "application/json",
+        delete( "/tables/:tableId", "application/json",
             ( request, response ) -> {
                 Map<String, Object> page = getNewPageModel( request );
                 return page;
             }, getJsonTransformer() );
 
-        post( "/fixtures", "application/json", ( request, response ) -> {
+        post( "/tables", "application/json", ( request, response ) -> {
             Map<String, Object> page = getNewPageModel( request );
             return page;
         }, getJsonTransformer() );
