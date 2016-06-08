@@ -1,10 +1,14 @@
 package com.footballfours.model.fixture;
 
+import javax.persistence.Column;
+
 public class Goalscorer
 {
+
     private String myName;
     private int myNumberOfGoals;
 
+    @Column
     public String getName()
     {
         return myName;
@@ -15,6 +19,7 @@ public class Goalscorer
         myName = name;
     }
 
+    @Column
     public int getNumberOfGoals()
     {
         return myNumberOfGoals;
@@ -25,6 +30,7 @@ public class Goalscorer
         myNumberOfGoals = numberOfGoals;
     }
 
+    @Column
     public boolean isMultipleGoals()
     {
         return myNumberOfGoals > 1;

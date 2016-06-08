@@ -2,11 +2,14 @@ package com.footballfours.model.fixture;
 
 import java.util.List;
 
+import javax.persistence.Column;
+
 public class Round
 {
     private int myRoundNumber;
     private List<Match> myMatches;
 
+    @Column
     public int getRoundNumber()
     {
         return myRoundNumber;
@@ -17,6 +20,7 @@ public class Round
         myRoundNumber = roundNumber;
     }
 
+    @Column
     public List<Match> getMatches()
     {
         return myMatches;

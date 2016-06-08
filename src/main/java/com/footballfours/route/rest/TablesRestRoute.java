@@ -7,6 +7,7 @@ import static spark.Spark.post;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +28,10 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class TablesRestRoute extends RegistrableRoute
 {
-    public TablesRestRoute( final ConnectionSource connectionSource )
+    public TablesRestRoute( final ConnectionSource connectionSource,
+                            final Connection connection )
     {
-        super( connectionSource );
+        super( connectionSource, connection );
     }
 
     @Override
@@ -40,17 +42,15 @@ public class TablesRestRoute extends RegistrableRoute
             return page;
         }, getJsonTransformer() );
 
-        get( "/tables/:tableId", "application/json",
-            ( request, response ) -> {
-                Map<String, Object> page = getNewPageModel( request );
-                return page;
-            }, getJsonTransformer() );
+        get( "/tables/:tableId", "application/json", ( request, response ) -> {
+            Map<String, Object> page = getNewPageModel( request );
+            return page;
+        }, getJsonTransformer() );
 
-        delete( "/tables/:tableId", "application/json",
-            ( request, response ) -> {
-                Map<String, Object> page = getNewPageModel( request );
-                return page;
-            }, getJsonTransformer() );
+        delete( "/tables/:tableId", "application/json", ( request, response ) -> {
+            Map<String, Object> page = getNewPageModel( request );
+            return page;
+        }, getJsonTransformer() );
 
         post( "/tables", "application/json", ( request, response ) -> {
             Map<String, Object> page = getNewPageModel( request );

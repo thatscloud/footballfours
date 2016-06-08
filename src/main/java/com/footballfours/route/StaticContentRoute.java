@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,14 +22,15 @@ import com.j256.ormlite.support.ConnectionSource;
 public class StaticContentRoute extends RegistrableRoute
 {
 
-    public StaticContentRoute( ConnectionSource connectionSource )
+    public StaticContentRoute( final ConnectionSource connectionSource,
+                               final Connection connection )
     {
-        super( connectionSource );
+        super( connectionSource, connection );
     }
 
     @Override
-    public Object handle( final Request request, final Response response )
-                                                                          throws Exception
+    public Object handle( final Request request,
+                          final Response response ) throws Exception
     {
         String uriString;
         if ( request.splat() == null || request.splat().length == 0 )
@@ -41,14 +43,14 @@ public class StaticContentRoute extends RegistrableRoute
         }
 
         boolean notFound = true;
-        String fullResourceAddress="";
+        String fullResourceAddress = "";
         List<String> resourcePaths = Arrays.asList( new String[] {
                 "com/footballfours/staticcontent/", "com/footballfours/ng/" } );
         for ( String resourcePath : resourcePaths )
         {
             fullResourceAddress = resourcePath + uriString;
-            final URL url = getClass().getClassLoader().getResource(
-                resourcePath + uriString );
+            final URL url = getClass().getClassLoader()
+                .getResource( resourcePath + uriString );
             if ( url == null )
             {
                 notFound = true;
@@ -74,8 +76,8 @@ public class StaticContentRoute extends RegistrableRoute
             fullResourceAddress = "com/footballfours/staticcontent/404.html";
         }
 
-        try (final InputStream in = getClass().getClassLoader().getResourceAsStream(
-            fullResourceAddress );
+        try (final InputStream in = getClass().getClassLoader()
+            .getResourceAsStream( fullResourceAddress );
                 final OutputStream out = response.raw().getOutputStream())
         {
             IOUtils.copy( in, out );

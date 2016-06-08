@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+import javax.persistence.Column;
+
 public class Match
 {
     private static final DateTimeFormatter DAY_OF_WEEK_NAME_FORMATTER =
@@ -28,6 +30,7 @@ public class Match
         return ldt.format( TIME_FORMATTER );
     }
 
+    @Column
     private static String getOrdinal( final int dayOfMonth )
     {
         if( dayOfMonth >= 11 && dayOfMonth <= 13 )
@@ -48,7 +51,8 @@ public class Match
     private LocalDateTime myScheduledDateTime;
     private LocalDateTime myPlayedDateTime;
     private String myStatus;
-
+    
+    @Column
     public Team getHomeTeam()
     {
         return myHomeTeam;
@@ -59,6 +63,7 @@ public class Match
         myHomeTeam = homeTeam;
     }
 
+    @Column
     public Team getAwayTeam()
     {
         return myAwayTeam;
@@ -69,6 +74,7 @@ public class Match
         myAwayTeam = awayTeam;
     }
 
+    @Column
     public LocalDateTime getScheduledDateTime()
     {
         return myScheduledDateTime;
@@ -79,6 +85,7 @@ public class Match
         myScheduledDateTime = scheduledDateTime;
     }
 
+    @Column
     public LocalDateTime getPlayedDateTime()
     {
         return myPlayedDateTime;
@@ -89,26 +96,31 @@ public class Match
         myPlayedDateTime = playedDateTime;
     }
 
+    @Column
     public String getScheduledDatePretty()
     {
         return localDateTimeToPrettyDateString( myScheduledDateTime );
     }
 
+    @Column
     public String getPlayedDatePretty()
     {
         return localDateTimeToPrettyDateString( myPlayedDateTime );
     }
 
+    @Column
     public String getScheduledTimePretty()
     {
         return localDateTimeToPrettyTimeString( myScheduledDateTime );
     }
 
+    @Column
     public String getPlayedTimePretty()
     {
         return localDateTimeToPrettyTimeString( myPlayedDateTime );
     }
 
+    @Column
     public String getStatus()
     {
         return myStatus;
@@ -119,11 +131,13 @@ public class Match
         myStatus = status;
     }
 
+    @Column
     public boolean isCompleted()
     {
         return Objects.equals( myStatus, "COMPLETED" );
     }
 
+    @Column
     public boolean isRescheduled()
     {
         return !Objects.equals( myScheduledDateTime, myPlayedDateTime );

@@ -4,7 +4,11 @@
 
  FootballFoursApp.config(function ($routeProvider) {
      $routeProvider.when('/', {
-     });
+     })
+     .when('/players', {
+         templateUrl: 'pages/rounds.html',
+         controller: 'roundsController'
+     })
 //     .when('/players', {
 //         templateUrl: 'pages/players.html',
 //         controller: 'playersController'

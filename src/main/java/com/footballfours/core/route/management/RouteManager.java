@@ -3,6 +3,7 @@ package com.footballfours.core.route.management;
 import static spark.Spark.before;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 import java.util.Set;
 
 import org.reflections.Reflections;
@@ -14,9 +15,9 @@ import com.j256.ormlite.support.ConnectionSource;
 public class RouteManager
 {
 
-    public static void insertRoutes( ConnectionSource connectionSource )
-                                                                        throws InstantiationException,
-                                                                        IllegalAccessException
+    public static void insertRoutes( ConnectionSource connectionSource,
+                                     Connection connection) throws InstantiationException,
+                                                                         IllegalAccessException
     {
         before( ( req, res ) -> {
             res.raw().setCharacterEncoding( StandardCharsets.UTF_8.toString() );
@@ -40,16 +41,16 @@ public class RouteManager
             allClasses.remove( StaticContentRoute.class );
             for ( Class<? extends RegistrableRoute> clazz : allClasses )
             {
-                clazz.getConstructor( ConnectionSource.class )
-                    .newInstance( connectionSource ).register();
+                clazz.getConstructor( ConnectionSource.class, Connection.class )
+                    .newInstance( connectionSource, connection).register();
                 System.out.println( "Route Registered: " + clazz.getName() );
             }
 
-            System.out
-                .println( "Registering Static Content Route (this must be done last)." );
-            new StaticContentRoute( connectionSource ).register();
-            System.out.println( "Route Registered: "
-                    + StaticContentRoute.class.getName() );
+            System.out.println(
+                "Registering Static Content Route (this must be done last)." );
+            new StaticContentRoute( connectionSource, connection ).register();
+            System.out.println(
+                "Route Registered: " + StaticContentRoute.class.getName() );
 
             System.out.println( "All Routes Registered." );
 

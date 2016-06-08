@@ -1,25 +1,28 @@
 package com.footballfours.core.route;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.footballfours.core.JsonTransformer;
+import com.j256.ormlite.support.ConnectionSource;
 
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import com.footballfours.core.JsonTransformer;
-import com.footballfours.core.user.User;
-import com.j256.ormlite.support.ConnectionSource;
-
 public abstract class RegistrableRoute implements Route
 {
     private final ConnectionSource connectionSource;
+    private final Connection connection;
 
     private final JsonTransformer jsonTransformer = new JsonTransformer();
 
-    public RegistrableRoute( ConnectionSource connectionSource )
+    public RegistrableRoute( ConnectionSource connectionSource ,
+                             Connection connection)
     {
         this.connectionSource = connectionSource;
+        this.connection = connection;
     }
 
     public ConnectionSource getConnectionSource()
@@ -27,6 +30,11 @@ public abstract class RegistrableRoute implements Route
         return connectionSource;
     }
 
+    public Connection getConnection()
+    {
+        return connection;
+    }
+    
     public JsonTransformer getJsonTransformer()
     {
         return jsonTransformer;

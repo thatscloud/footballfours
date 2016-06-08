@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class Main
     private static final Logger theLogger = LoggerFactory.getLogger( Main.class );
 
     public static void main( final String[] args ) throws InstantiationException,
-                                                  IllegalAccessException
+                                                   IllegalAccessException
     {
         try
         {
@@ -46,8 +47,8 @@ public class Main
                 final Map<String, String> env = new HashMap<>();
                 env.put( "create", "true" );
                 FileSystems.newFileSystem( jarUri, env );
-                theLogger.info( "Loading static resources from jar( " + jarUri
-                        + " )" );
+                theLogger
+                    .info( "Loading static resources from jar( " + jarUri + " )" );
             }
             else
             {
@@ -98,8 +99,17 @@ public class Main
         final HandlebarsRouteFactory hbRouteFactory = new HandlebarsRouteFactory(
             "/com/footballfours/template", connectionPool );
 
-        ConnectionSource connectionSource;
+        Connection restConnection = null;
+        try
+        {
+            restConnection = connectionPool.getConnection();
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( "Could not get connection.", e );
+        }
 
+        ConnectionSource connectionSource;
         try
         {
             connectionSource = new JdbcConnectionSource(
@@ -111,9 +121,9 @@ public class Main
         {
             throw new RuntimeException( e );
         }
-        
+
         // New Rest Routes
-        RouteManager.insertRoutes( connectionSource );
+        RouteManager.insertRoutes( connectionSource, restConnection );
         InjectManager.prepareInjections( connectionSource );
 
         // Old Handlbars routes
@@ -132,8 +142,7 @@ public class Main
             FixturesModelBuilder::getRoundsFromConnection ) );
         get( "/tables.html", hbRouteFactory.from( "tables",
             TablesModelBuilder::getTablesFromConnection ) );
-        get( "/*", new StaticContentRoute( connectionSource ) );
+        get( "/*", new StaticContentRoute( connectionSource, restConnection ) );
 
-        
     }
 }

@@ -4,6 +4,7 @@ import static spark.Spark.get;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Connection;
 
 import org.apache.commons.io.IOUtils;
 
@@ -16,22 +17,23 @@ import com.j256.ormlite.support.ConnectionSource;
 public class IndexRoute extends RegistrableRoute
 {
 
-    public IndexRoute( ConnectionSource connectionSource )
+    public IndexRoute( final ConnectionSource connectionSource,
+                       final Connection connection )
     {
-        super( connectionSource );
+        super( connectionSource, connection );
     }
 
     @Override
-    public Object handle( final Request request, final Response response )
-                                                                          throws Exception
+    public Object handle( final Request request,
+                          final Response response ) throws Exception
     {
-        try (final InputStream in = getClass().getClassLoader().getResourceAsStream(
-            "com/footballfours/ng/pages/index.html" );
+        try (final InputStream in = getClass().getClassLoader()
+            .getResourceAsStream( "com/footballfours/ng/pages/index.html" );
                 final OutputStream out = response.raw().getOutputStream())
         {
             IOUtils.copy( in, out );
         }
-        catch(Exception e)
+        catch ( Exception e )
         {
             response.redirect( getFullUrl( request, "/404" ) );
         }

@@ -3,6 +3,7 @@ package com.footballfours.route.rest;
 import static spark.Spark.get;
 import static spark.Spark.post;
 
+import java.sql.Connection;
 import java.util.Map;
 
 import com.footballfours.core.route.RegistrableRoute;
@@ -11,9 +12,10 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class AuthRoute extends RegistrableRoute
 {
-    public AuthRoute( final ConnectionSource connectionSource )
+    public AuthRoute( final ConnectionSource connectionSource,
+                      final Connection connection )
     {
-        super( connectionSource );
+        super( connectionSource, connection );
     }
 
     @Override

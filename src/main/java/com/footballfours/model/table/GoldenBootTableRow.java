@@ -1,5 +1,7 @@
 package com.footballfours.model.table;
 
+import javax.persistence.Column;
+
 public class GoldenBootTableRow
 {
     private int myPosition;
@@ -7,6 +9,7 @@ public class GoldenBootTableRow
     private String myTeamName;
     private int myGoals;
 
+    @Column
     public int getPosition()
     {
         return myPosition;
@@ -17,6 +20,7 @@ public class GoldenBootTableRow
         myPosition = position;
     }
 
+    @Column
     public String getPlayerName()
     {
         return myPlayerName;
@@ -27,6 +31,7 @@ public class GoldenBootTableRow
         myPlayerName = playerName;
     }
 
+    @Column
     public String getTeamName()
     {
         return myTeamName;
@@ -37,6 +42,7 @@ public class GoldenBootTableRow
         myTeamName = teamName;
     }
 
+    @Column
     public int getGoals()
     {
         return myGoals;
