@@ -22,10 +22,9 @@ import com.j256.ormlite.support.ConnectionSource;
 public class StaticContentRoute extends RegistrableRoute
 {
 
-    public StaticContentRoute( final ConnectionSource connectionSource,
-                               final Connection connection )
+    public StaticContentRoute( final Connection connection )
     {
-        super( connectionSource, connection );
+        super( connection );
     }
 
     @Override

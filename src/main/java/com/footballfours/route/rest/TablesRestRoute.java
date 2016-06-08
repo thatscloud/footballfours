@@ -28,10 +28,9 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class TablesRestRoute extends RegistrableRoute
 {
-    public TablesRestRoute( final ConnectionSource connectionSource,
-                            final Connection connection )
+    public TablesRestRoute( final Connection connection )
     {
-        super( connectionSource, connection );
+        super( connection );
     }
 
     @Override

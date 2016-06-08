@@ -13,21 +13,13 @@ import spark.Route;
 
 public abstract class RegistrableRoute implements Route
 {
-    private final ConnectionSource connectionSource;
     private final Connection connection;
 
     private final JsonTransformer jsonTransformer = new JsonTransformer();
 
-    public RegistrableRoute( ConnectionSource connectionSource ,
-                             Connection connection)
+    public RegistrableRoute( Connection connection)
     {
-        this.connectionSource = connectionSource;
         this.connection = connection;
-    }
-
-    public ConnectionSource getConnectionSource()
-    {
-        return connectionSource;
     }
 
     public Connection getConnection()

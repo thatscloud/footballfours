@@ -15,8 +15,7 @@ import com.j256.ormlite.support.ConnectionSource;
 public class RouteManager
 {
 
-    public static void insertRoutes( ConnectionSource connectionSource,
-                                     Connection connection) throws InstantiationException,
+    public static void insertRoutes( Connection connection) throws InstantiationException,
                                                                          IllegalAccessException
     {
         before( ( req, res ) -> {
@@ -41,14 +40,14 @@ public class RouteManager
             allClasses.remove( StaticContentRoute.class );
             for ( Class<? extends RegistrableRoute> clazz : allClasses )
             {
-                clazz.getConstructor( ConnectionSource.class, Connection.class )
-                    .newInstance( connectionSource, connection).register();
+                clazz.getConstructor( Connection.class )
+                    .newInstance( connection).register();
                 System.out.println( "Route Registered: " + clazz.getName() );
             }
 
             System.out.println(
                 "Registering Static Content Route (this must be done last)." );
-            new StaticContentRoute( connectionSource, connection ).register();
+            new StaticContentRoute( connection ).register();
             System.out.println(
                 "Route Registered: " + StaticContentRoute.class.getName() );
 

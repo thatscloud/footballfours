@@ -12,10 +12,9 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class AuthRoute extends RegistrableRoute
 {
-    public AuthRoute( final ConnectionSource connectionSource,
-                      final Connection connection )
+    public AuthRoute( final Connection connection )
     {
-        super( connectionSource, connection );
+        super( connection );
     }
 
     @Override

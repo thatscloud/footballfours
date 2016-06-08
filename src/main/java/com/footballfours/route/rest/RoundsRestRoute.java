@@ -15,10 +15,9 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class RoundsRestRoute extends RegistrableRoute
 {
-    public RoundsRestRoute( final ConnectionSource connectionSource,
-                            final Connection connection )
+    public RoundsRestRoute( final Connection connection )
     {
-        super( connectionSource, connection );
+        super( connection );
     }
 
     @Override

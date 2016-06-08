@@ -17,10 +17,9 @@ import com.j256.ormlite.support.ConnectionSource;
 public class IndexRoute extends RegistrableRoute
 {
 
-    public IndexRoute( final ConnectionSource connectionSource,
-                       final Connection connection )
+    public IndexRoute( final Connection connection )
     {
-        super( connectionSource, connection );
+        super( connection );
     }
 
     @Override

@@ -19,14 +19,11 @@ import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.footballfours.core.inject.InjectManager;
 import com.footballfours.core.route.management.RouteManager;
 import com.footballfours.model.fixture.builder.FixturesModelBuilder;
 import com.footballfours.model.table.builder.TablesModelBuilder;
 import com.footballfours.route.HandlebarsRouteFactory;
 import com.footballfours.route.StaticContentRoute;
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.support.ConnectionSource;
 
 public class Main
 {
@@ -109,22 +106,8 @@ public class Main
             throw new RuntimeException( "Could not get connection.", e );
         }
 
-        ConnectionSource connectionSource;
-        try
-        {
-            connectionSource = new JdbcConnectionSource(
-                "jdbc:h2:./footballfours;CIPHER=AES;mode=mysql", sqlUsername,
-                connectionPassword );
-
-        }
-        catch ( final SQLException e )
-        {
-            throw new RuntimeException( e );
-        }
-
         // New Rest Routes
-        RouteManager.insertRoutes( connectionSource, restConnection );
-        InjectManager.prepareInjections( connectionSource );
+        RouteManager.insertRoutes( restConnection );
 
         // Old Handlbars routes
         before( ( req, res ) -> {
@@ -142,7 +125,7 @@ public class Main
             FixturesModelBuilder::getRoundsFromConnection ) );
         get( "/tables.html", hbRouteFactory.from( "tables",
             TablesModelBuilder::getTablesFromConnection ) );
-        get( "/*", new StaticContentRoute( connectionSource, restConnection ) );
+        get( "/*", new StaticContentRoute( restConnection ) );
 
     }
 }
