@@ -1,7 +1,8 @@
  FootballFoursApp.controller('roundsController', function($scope,$http){
 	   
 	   $http.get("/rounds",httpConfig).success( function(response) {
-	      $scope.rounds = response.rounds;
+		   $scope.pageHeading= "Fixtures";
+		   $scope.rounds = response.rounds;
 	   });
 	   
    });

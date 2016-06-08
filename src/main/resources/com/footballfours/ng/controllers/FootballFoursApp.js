@@ -1,26 +1,23 @@
  var FootballFoursApp = angular.module("FootballFoursApp",[
  'ngRoute'
  ]);
-
+ 
+ var httpConfig = {headers: {'Accept': 'application/json;odata=verbose'}};
+ 
+ 
  FootballFoursApp.config(function ($routeProvider) {
      $routeProvider.when('/', {
      })
-     .when('/players', {
+     .when('/rounds', {
          templateUrl: 'pages/rounds.html',
-         controller: 'roundsController'
-     })
-//     .when('/players', {
-//         templateUrl: 'pages/players.html',
-//         controller: 'playersController'
-//     })
-//     .when('/competitions', {
-//         templateUrl: 'pages/competitions.html',
-//         controller: 'competitionsController'
-//     })
-//     .when('/teams', {
-//         templateUrl: 'pages/teams.html',
-//         controller: 'teamsController'
-//     });
+         controller: 'roundsController',
+         pageHeading: 'fixtures'
+         
+     });
  });
  
- var httpConfig = {headers: {'Accept': 'application/json;odata=verbose'}};
+ FootballFoursApp.run(['$rootScope', function($rootScope) {
+	    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+	        $rootScope.pageHeading = current.$$route.pageHeading;
+	    });
+ }]);
