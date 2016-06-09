@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.footballfours.core.route.RegistrableRoute;
 import com.footballfours.model.fixture.Round;
 import com.footballfours.model.fixture.builder.FixturesModelBuilder;
+import com.footballfours.model.table.Tables;
+import com.footballfours.model.table.builder.TablesModelBuilder;
 import com.footballfours.persist.RunAgainstDataSource;
 import com.footballfours.util.SessionUtils;
 import com.github.jknack.handlebars.Handlebars;
@@ -38,6 +40,12 @@ public class TablesRestRoute extends RegistrableRoute
     {
         get( "/tables", "application/json", ( request, response ) -> {
             Map<String, Object> page = getNewPageModel( request );
+            
+            final Tables tables  =
+                    TablesModelBuilder.getTablesFromConnection( getConnection() );
+            
+            page.put( "tables", tables );
+            
             return page;
         }, getJsonTransformer() );
 

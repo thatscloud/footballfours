@@ -13,6 +13,12 @@
          controller: 'roundsController',
          pageHeading: 'fixtures'
          
+     })
+     .when('/tables', {
+         templateUrl: 'pages/tables.html',
+         controller: 'tablesController',
+         pageHeading: 'tables'
+         
      });
  });
  
