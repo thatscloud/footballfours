@@ -1,7 +1,7 @@
  FootballFoursApp.controller('tablesController', function($scope,$http){
 	   
 	   $http.get("/tables",httpConfig).success( function(response) {
-		   $scope.rounds = response.rounds;
+		   $scope.tables = response.tables;
 	   });
 	   
    });
