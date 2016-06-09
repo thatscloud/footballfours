@@ -1,12 +1,8 @@
 package com.footballfours;
 
-import static spark.Spark.before;
-import static spark.Spark.get;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,10 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.footballfours.core.route.management.RouteManager;
-import com.footballfours.model.fixture.builder.FixturesModelBuilder;
-import com.footballfours.model.table.builder.TablesModelBuilder;
-import com.footballfours.route.HandlebarsRouteFactory;
-import com.footballfours.route.StaticContentRoute;
 
 public class Main
 {
@@ -93,9 +85,6 @@ public class Main
             throw new RuntimeException( e );
         }
 
-        final HandlebarsRouteFactory hbRouteFactory = new HandlebarsRouteFactory(
-            "/com/footballfours/template", connectionPool );
-
         Connection restConnection = null;
         try
         {
@@ -105,23 +94,6 @@ public class Main
         {
             throw new RuntimeException( "Could not get connection.", e );
         }
-        
-        // Old Handlebars routes
-        before( ( req, res ) -> {
-            res.raw().setCharacterEncoding( StandardCharsets.UTF_8.toString() );
-            if ( req.pathInfo().endsWith( ".html" ) )
-            {
-                res.raw().setContentType( "text/html; charset=utf-8" );
-            }
-            else if ( req.pathInfo().endsWith( ".css" ) )
-            {
-                res.raw().setContentType( "text/css; charset=utf-8" );
-            }
-        } );
-        get( "/fixtures.html", hbRouteFactory.from( "fixtures",
-            FixturesModelBuilder::getRoundsFromConnection ) );
-        get( "/tables.html", hbRouteFactory.from( "tables",
-            TablesModelBuilder::getTablesFromConnection ) );
         
         // New Rest Routes
         RouteManager.insertRoutes( restConnection );
