@@ -1,13 +1,10 @@
 package com.footballfours;
 
-import static spark.Spark.before;
-import static spark.Spark.get;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,22 +15,20 @@ import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.footballfours.model.fixture.builder.FixturesModelBuilder;
-import com.footballfours.model.table.builder.TablesModelBuilder;
-import com.footballfours.route.HandlebarsRouteFactory;
-import com.footballfours.route.StaticContentRoute;
+import com.footballfours.core.route.management.RouteManager;
 
 public class Main
 {
     private static final Logger theLogger = LoggerFactory.getLogger( Main.class );
 
-    public static void main( final String[] args )
+    public static void main( final String[] args ) throws InstantiationException,
+                                                   IllegalAccessException
     {
         try
         {
-            final URI uri = Main.class.getClassLoader().getResource(
-                                 "com/footballfours/Main.class" ).toURI();
-            if( uri.getScheme().equals( "jar" ) )
+            final URI uri = Main.class.getClassLoader()
+                .getResource( "com/footballfours/Main.class" ).toURI();
+            if ( uri.getScheme().equals( "jar" ) )
             {
                 final String uriString = uri.toString();
                 final String jarUriString = uriString.split( "!" )[0];
@@ -41,15 +36,15 @@ public class Main
                 final Map<String, String> env = new HashMap<>();
                 env.put( "create", "true" );
                 FileSystems.newFileSystem( jarUri, env );
-                theLogger.info(
-                    "Loading static resources from jar( " + jarUri + " )" );
+                theLogger
+                    .info( "Loading static resources from jar( " + jarUri + " )" );
             }
             else
             {
                 theLogger.info( "Loading static resources from filesystem" );
             }
         }
-        catch( final URISyntaxException | IOException e )
+        catch ( final URISyntaxException | IOException e )
         {
             throw new RuntimeException( e );
         }
@@ -57,11 +52,10 @@ public class Main
         final String sqlUsername = "football";
         final String sqlPassword = "fours";
         final String encryptionPassword = "footballfours";
+        final String connectionPassword = encryptionPassword + " " + sqlPassword;
         final JdbcConnectionPool connectionPool = JdbcConnectionPool.create(
-            "jdbc:h2:./footballfours;CIPHER=AES",
-            sqlUsername,
-            encryptionPassword + " " + sqlPassword );
-        
+            "jdbc:h2:./footballfours;CIPHER=AES", sqlUsername, connectionPassword );
+
         final Flyway flyway = new Flyway();
         flyway.setDataSource( connectionPool );
         flyway.setLocations( "classpath:com/footballfours/persist/migration" );
@@ -74,7 +68,7 @@ public class Main
             server.start();
             theLogger.info( "DB web server started on port " + server.getPort() );
         }
-        catch( final SQLException e )
+        catch ( final SQLException e )
         {
             throw new RuntimeException( e );
         }
@@ -86,40 +80,24 @@ public class Main
             server.start();
             theLogger.info( "DB tcp server started on port " + server.getPort() );
         }
-        catch( final SQLException e )
+        catch ( final SQLException e )
         {
             throw new RuntimeException( e );
         }
 
-        final HandlebarsRouteFactory hbRouteFactory =
-            new HandlebarsRouteFactory( "/com/footballfours/template",
-                                        connectionPool );
+        Connection restConnection = null;
+        try
+        {
+            restConnection = connectionPool.getConnection();
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( "Could not get connection.", e );
+        }
+        
+        // New Rest Routes
+        RouteManager.insertRoutes( restConnection );
+        
 
-        before( ( req, res ) ->
-        {
-            res.raw().setCharacterEncoding( StandardCharsets.UTF_8.toString() );
-            if( req.pathInfo().endsWith( ".html" ) )
-            {
-                res.raw().setContentType( "text/html; charset=utf-8" );
-            }
-            else if( req.pathInfo().endsWith( ".css" ) )
-            {
-                res.raw().setContentType( "text/css; charset=utf-8" );
-            }
-        } );
-        get( "/", ( req, res ) ->
-        {
-            res.redirect( "/fixtures.html", 302 );
-            return res.raw();
-        } );
-        get( "/fixtures.html",
-             hbRouteFactory.from(
-                 "fixtures",
-                 FixturesModelBuilder::getRoundsFromConnection ) );
-        get( "/tables.html",
-             hbRouteFactory.from(
-                 "tables",
-                 TablesModelBuilder::getTablesFromConnection ) );
-        get( "/*", new StaticContentRoute() );
     }
 }

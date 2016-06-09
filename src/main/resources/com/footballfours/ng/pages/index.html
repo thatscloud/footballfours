@@ -1,0 +1,65 @@
+<html ng-app="FootballFoursApp">
+<head>
+  <!-- Basic Page Needs
+  ---------------------------------------------------------------------------------------------------- -->
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  
+    <title>Football Fours</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  ---------------------------------------------------------------------------------------------------- -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  ---------------------------------------------------------------------------------------------------- -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  ---------------------------------------------------------------------------------------------------- -->
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+
+  <!-- Favicon
+  ---------------------------------------------------------------------------------------------------- -->
+  <!--<link rel="icon" type="image/png" href="images/favicon.png"> -->
+    <link rel="stylesheet" href="css/custom.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular-route.min.js"></script>
+    <script src=../controllers/FootballFoursApp.js></script>
+    <script src=../controllers/UserController.js></script>
+    <script src=../controllers/RoundsController.js></script>
+    <script src=../controllers/TablesController.js></script>
+    
+</head>
+<body>
+ <div class="section header" ng-controller="userController">
+    <div class="container">
+      <div class="row">
+      <div ng-hide="user == null" >
+            Logged in as {{user.username}} <a ng-click="logout()">Log out?</a>
+      </div>
+      <div ng-show="user == null" >
+            <form ng-submit="login()">
+            <input type="submit" id="submit" value="Log in?" />
+            </form>
+      </div>
+        <div class="twelve columns">
+          <h1 class="section-heading">Football Fours</h1>
+          <h5 class="section-heading">{{pageHeading}}</h5>
+          
+          <div class="nav">
+            <a href="#rounds">Fixtures / Results</a> -  
+            <a href="#tables">Tables</a> - 
+            <a href="#rules">Rules</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section leaguetable">
+    <div class="container" ng-view=""/>
+  </div>
+</body>
+</html>

@@ -2,12 +2,15 @@ package com.footballfours.model.fixture;
 
 import java.util.List;
 
+import javax.persistence.Column;
+
 public class Team
 {
     private String myName;
     private int myGoals;
     private List<Goalscorer> myGoalscorers;
 
+    @Column
     public String getName()
     {
         return myName;
@@ -18,6 +21,7 @@ public class Team
         myName = name;
     }
 
+    @Column
     public int getGoals()
     {
         return myGoals;
@@ -28,6 +32,7 @@ public class Team
         myGoals = goals;
     }
 
+    @Column
     public List<Goalscorer> getGoalscorers()
     {
         return myGoalscorers;

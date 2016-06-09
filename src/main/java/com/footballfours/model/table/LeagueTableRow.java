@@ -1,5 +1,7 @@
 package com.footballfours.model.table;
 
+import javax.persistence.Column;
+
 public class LeagueTableRow
 {
     private int myPosition;
@@ -13,6 +15,7 @@ public class LeagueTableRow
     private int myGoalDifference;
     private int myPoints;
 
+    @Column
     public int getPosition()
     {
         return myPosition;
@@ -23,6 +26,7 @@ public class LeagueTableRow
         myPosition = position;
     }
 
+    @Column
     public String getTeamName()
     {
         return myTeamName;
@@ -33,6 +37,7 @@ public class LeagueTableRow
         myTeamName = teamName;
     }
 
+    @Column
     public int getMatchesPlayed()
     {
         return myMatchesPlayed;
@@ -43,6 +48,7 @@ public class LeagueTableRow
         myMatchesPlayed = matchesPlayed;
     }
 
+    @Column
     public int getNumberOfWins()
     {
         return myNumberOfWins;
@@ -53,6 +59,7 @@ public class LeagueTableRow
         myNumberOfWins = numberOfWins;
     }
 
+    @Column
     public int getNumberOfDraws()
     {
         return myNumberOfDraws;
@@ -63,6 +70,7 @@ public class LeagueTableRow
         myNumberOfDraws = numberOfDraws;
     }
 
+    @Column
     public int getNumberOfLosses()
     {
         return myNumberOfLosses;
@@ -73,6 +81,7 @@ public class LeagueTableRow
         myNumberOfLosses = numberOfLosses;
     }
 
+    @Column
     public int getGoalsFor()
     {
         return myGoalsFor;
@@ -83,6 +92,7 @@ public class LeagueTableRow
         myGoalsFor = goalsFor;
     }
 
+    @Column
     public int getGoalsAgainst()
     {
         return myGoalsAgainst;
@@ -93,6 +103,7 @@ public class LeagueTableRow
         myGoalsAgainst = goalsAgainst;
     }
 
+    @Column
     public int getGoalDifference()
     {
         return myGoalDifference;
@@ -103,11 +114,13 @@ public class LeagueTableRow
         myGoalDifference = goalDifference;
     }
 
+    @Column
     public int getPoints()
     {
         return myPoints;
     }
 
+    @Column
     public void setPoints( final int points )
     {
         myPoints = points;
