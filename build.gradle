@@ -15,7 +15,6 @@ dependencies {
     compile 'com.h2database:h2:1.4.190'
     compile 'commons-io:commons-io:2.4'
     compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'com.github.jknack:handlebars:4.0.3'
     compile 'org.apache.commons:commons-csv:1.2'
     compile 'org.flywaydb:flyway-core:4.0.1'
     
