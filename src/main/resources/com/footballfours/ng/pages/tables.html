@@ -1,8 +1,94 @@
-<table>
-	<tr>
-		<td><label> tablecrap </label></td>
-	</tr>
-	<tr>
-		<td>{{tables | prettyJSON}}</td>
-	</tr>
-</table>
+<table></table>
+<div class="section leaguetable">
+    <h2 class="section-heading">League Table</h2>
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <table class="u-full-width">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Team</th>
+                <th>P</th>
+                <th>W</th>
+                <th>D</th>
+                <th>L</th>
+                <th>F</th>
+                <th>A</th>
+                <th>+/-</th>
+                <th>Pts</th>
+              <tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="leagueTable in tables.leagueTable">
+                  <td>{{leagueTable.position}}</td>
+                  <td>{{leagueTable.teamName}}</td>
+                  <td>{{leagueTable.matchesPlayed}}</td>
+                  <td>{{leagueTable.numberOfWins}}</td>
+                  <td>{{leagueTable.numberOfDraws}}</td>
+                  <td>{{leagueTable.numberOfLosses}}</td>
+                  <td>{{leagueTable.goalsFor}}</td>
+                  <td>{{leagueTable.goalsAgainst}}</td>
+                  <td>{{leagueTable.goalDifference}}</td>
+                  <td>{{leagueTable.points}}</td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section goldenball">
+    <h2 class="section-heading">Golden Ball</h2>
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <table class="u-full-width">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Team</th>
+                <th>Votes</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat= "goldenBall in tables.goldenBallTable">
+                  <td>{{goldenBall.position}}</td>
+                  <td>{{goldenBall.playerName}}</td>
+                  <td>{{goldenBall.teamName}}</td>
+                  <td>{{goldenBall.votes}}</td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section goldenboot">
+    <h2 class="section-heading">Golden Boot</h2>
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <table class="u-full-width">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Team</th>
+                <th>Goals</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat= "goldenBoot in tables.goldenBootTable">
+                  <td>{{goldenBoot.position}}</td>
+                  <td>{{goldenBoot.playerName}}</td>
+                  <td>{{goldenBoot.teamName}}</td>
+                  <td>{{goldenBoot.goals}}</td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>  

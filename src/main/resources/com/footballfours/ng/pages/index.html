@@ -47,18 +47,18 @@
       </div>
         <div class="twelve columns">
           <h1 class="section-heading">Football Fours</h1>
-          <div id="nav" class="fourteen columns">
-		      <ul>
-		          <li><a href="#rounds">Fixtures</a></li>
-		          <li><a href="#tables">Tables</a></li>
-	          </ul>
-		  </div>
+          <h5 class="section-heading">{{pageHeading}}</h5>
+          
+          <div class="nav">
+            <a href="#rounds">Fixtures / Results</a> -  
+            <a href="#tables">Tables</a> - 
+            <a href="#rules">Rules</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
   <div class="section leaguetable">
-    <h2 class="section-heading">{{pageHeading}}</h2>
     <div class="container" ng-view=""/>
   </div>
 </body>

@@ -1,8 +1,31 @@
-<table>
-<tr>
-    <td><label>Round number:</label></td>
-</tr>
 <tr ng-repeat="round in rounds">
 <td>{{round.roundNumber}}</td>
 </tr>
-</table>
+<div ng-repeat="round in rounds">
+  <div class="section round{{round.roundNumber}}">
+    <div class="container">  
+      <h2 class="section-heading">Round {{round.roundNumber}}</h2>
+      <div ng-repeat="match in round.matches">
+        <div class="row matchDateAndTime{{rescheduled === 'true' ? 'rescheduled' : ''}}">
+          <span class="matchDate">{{match.playedDatePretty}}</span>
+          <span class="matchTime">{{match.playedTimePretty}}</span>
+        </div>
+        <div class="row">
+          <div ng-repeat="homeTeam in [match.homeTeam]">
+            <div class="homeTeam five columns">
+              <div>{{homeTeam.name}}</div>
+                  <div class="scorer" ng-repeat="goalscorer in homeTeam.goalscorers">{{goalscorer.name}}{{multipleGoals === 'true' ? '× ' + goalscorer.numberOfGoals : ''}}</div>
+            </div>
+          </div>
+          <div class="matchScore two columns">{{round.completed === 'true' ? homeTeam.goals + '-' + awayTeam.goals : ' V '}}</div>
+          <div ng-repeat="awayTeam in [match.awayTeam]">
+            <div class="awayTeam five columns">
+              <div>{{awayTeam.name}}</div>
+                  <div class="scorer" ng-repeat="goalscorer in awayTeam.goalscorers">{{goalscorer.name}}{{multipleGoals === 'true' ? '× ' + goalscorer.numberOfGoals : ''}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

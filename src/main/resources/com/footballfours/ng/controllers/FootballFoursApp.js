@@ -17,6 +17,10 @@ FootballFoursApp.config(function($routeProvider) {
 		controller : 'tablesController',
 		pageHeading : 'tables'
 
+	}).when('/rules', {
+		templateUrl : 'pages/rulessummary.html',
+		pageHeading : 'rules'
+
 	});
 });
 

@@ -105,11 +105,8 @@ public class Main
         {
             throw new RuntimeException( "Could not get connection.", e );
         }
-
-        // New Rest Routes
-        RouteManager.insertRoutes( restConnection );
-
-        // Old Handlbars routes
+        
+        // Old Handlebars routes
         before( ( req, res ) -> {
             res.raw().setCharacterEncoding( StandardCharsets.UTF_8.toString() );
             if ( req.pathInfo().endsWith( ".html" ) )
@@ -125,7 +122,10 @@ public class Main
             FixturesModelBuilder::getRoundsFromConnection ) );
         get( "/tables.html", hbRouteFactory.from( "tables",
             TablesModelBuilder::getTablesFromConnection ) );
-        get( "/*", new StaticContentRoute( restConnection ) );
+        
+        // New Rest Routes
+        RouteManager.insertRoutes( restConnection );
+        
 
     }
 }
