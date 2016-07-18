@@ -26,6 +26,11 @@ FROM
     goalsAgainst
     FROM
     team t
+    INNER JOIN season s ON
+    t.id_season = s.id_season
+    INNER JOIN parameter param ON
+    param.cd_parameter = 'CURRENT_SEASON' AND
+    param.tx_parameter = s.id_season
     LEFT OUTER JOIN match_team mt ON
     mt.id_team = t.id_team
     LEFT OUTER JOIN match m ON

@@ -6,7 +6,12 @@ SELECT
 FROM
 player p
 INNER JOIN team t ON
-t.id_team = p.id_team 
+t.id_team = p.id_team
+INNER JOIN season s ON
+t.id_season = s.id_season
+INNER JOIN parameter param ON
+param.cd_parameter = 'CURRENT_SEASON' AND
+param.tx_parameter = s.id_season 
 INNER JOIN match_team_player mtp ON
 p.id_player = mtp.id_player
 INNER JOIN golden_ball_vote gbv ON

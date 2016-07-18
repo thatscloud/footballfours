@@ -1299,3 +1299,10 @@ WHERE
     p.nm_family = 'Davis' AND
     r.no_round = 2 AND
     t.nm_team = '2KOOL4SKOOL';
+    
+MERGE INTO parameter ( id_parameter, cd_parameter, tx_parameter ) KEY( cd_parameter ) VALUES
+( 
+    NVL( SELECT id_parameter FROM parameter WHERE cd_parameter = 'CURRENT_SEASON', RANDOM_UUID() ), 
+    'CURRENT_SEASON', 
+    SELECT id_season FROM season WHERE nm_season = 'Summer 2015/2016' 
+);

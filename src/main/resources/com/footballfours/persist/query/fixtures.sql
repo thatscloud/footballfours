@@ -15,6 +15,11 @@ SELECT
 FROM round r
 INNER JOIN match m ON
 m.id_round = r.id_round
+INNER JOIN season s ON
+r.id_season = s.id_season
+INNER JOIN parameter param ON
+param.cd_parameter = 'CURRENT_SEASON' AND
+param.tx_parameter = s.id_season
 INNER JOIN match_team hmt ON
 hmt.cd_team_type = 'HOME' AND
 hmt.id_match = m.id_match
