@@ -17,7 +17,7 @@ FROM
                    homeTeamLoss = 1 AND t.id_team <> homeTeamId
               THEN 1
               ELSE 0 END ) AS win,
-    SUM( homeTeamDraw ) AS draw,
+    SUM( CASE WHEN homeTeamDraw = 1 THEN 1 ELSE 0 END ) AS draw,
     SUM( CASE WHEN homeTeamWin = 1 AND t.id_team <> homeTeamId OR
                    homeTeamLoss = 1 AND t.id_team = homeTeamId
               THEN 1
@@ -75,6 +75,7 @@ FROM
                 amt.id_match
         )
         ON m.id_match = awayMatchId
+        WHERE m.cd_status = 'COMPLETED'
     )
     ON m.id_match = matchId
     LEFT OUTER JOIN
