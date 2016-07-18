@@ -4,3 +4,5 @@
 /bin/
 /batchexample/
 /*.db
+/.gradle/
+/auth.json

@@ -1,73 +1,82 @@
-INSERT INTO team ( id_team, nm_team ) VALUES ( RANDOM_UUID(), 'The Motherf***ing Meme Team' );
-INSERT INTO team ( id_team, nm_team ) VALUES ( RANDOM_UUID(), 'Testers FC' );
-INSERT INTO team ( id_team, nm_team ) VALUES ( RANDOM_UUID(), 'X' );
-INSERT INTO team ( id_team, nm_team ) VALUES ( RANDOM_UUID(), '2KOOL4SKOOL' );
+INSERT INTO season ( id_season, nm_season ) VALUES ( RANDOM_UUID(), 'Summer 2015/2016' );
 
-INSERT INTO round ( id_round, no_round ) VALUES ( RANDOM_UUID(), 1 );
-INSERT INTO round ( id_round, no_round ) VALUES ( RANDOM_UUID(), 2 );
-INSERT INTO round ( id_round, no_round ) VALUES ( RANDOM_UUID(), 3 );
+INSERT INTO team ( id_team, nm_team, id_season ) VALUES ( RANDOM_UUID(), 'The Motherf***ing Meme Team', SELECT id_season FROM season WHERE nm_season = 'Summer 2015/2016' );
+INSERT INTO team ( id_team, nm_team, id_season ) VALUES ( RANDOM_UUID(), 'Testers FC', SELECT id_season FROM season WHERE nm_season = 'Summer 2015/2016' );
+INSERT INTO team ( id_team, nm_team, id_season ) VALUES ( RANDOM_UUID(), 'X', SELECT id_season FROM season WHERE nm_season = 'Summer 2015/2016' );
+INSERT INTO team ( id_team, nm_team, id_season ) VALUES ( RANDOM_UUID(), '2KOOL4SKOOL', SELECT id_season FROM season WHERE nm_season = 'Summer 2015/2016' );
 
-INSERT INTO match ( id_match, id_round, dt_scheduled, dt_played, cd_status ) 
+INSERT INTO round ( id_round, no_round, id_season ) VALUES ( RANDOM_UUID(), 1, SELECT id_season FROM season WHERE nm_season = 'Summer 2015/2016' );
+INSERT INTO round ( id_round, no_round, id_season ) VALUES ( RANDOM_UUID(), 2, SELECT id_season FROM season WHERE nm_season = 'Summer 2015/2016' );
+INSERT INTO round ( id_round, no_round, id_season ) VALUES ( RANDOM_UUID(), 3, SELECT id_season FROM season WHERE nm_season = 'Summer 2015/2016' );
+
+INSERT INTO match ( id_match, id_round, id_season, dt_scheduled, dt_played, cd_status ) 
 SELECT
     RANDOM_UUID(),
     id_round,
+    id_season,
     TIMESTAMP '2012-01-01 12:00:00',
     TIMESTAMP '2012-01-01 12:00:00',
     'COMPLETED'
 FROM round 
 WHERE no_round = 1;
-INSERT INTO match ( id_match, id_round, dt_scheduled, dt_played, cd_status ) 
+INSERT INTO match ( id_match, id_round, id_season, dt_scheduled, dt_played, cd_status )
 SELECT
     RANDOM_UUID(),
     id_round,
+    id_season,
     TIMESTAMP '2012-01-01 12:00:00',
     TIMESTAMP '2012-01-02 12:00:00',
     'COMPLETED'
 FROM round 
 WHERE no_round = 1;
-INSERT INTO match ( id_match, id_round, dt_scheduled, dt_played, cd_status ) 
+INSERT INTO match ( id_match, id_round, id_season, dt_scheduled, dt_played, cd_status )
 SELECT
     RANDOM_UUID(),
     id_round,
+    id_season,
     TIMESTAMP '2012-01-03 12:00:00',
     TIMESTAMP '2012-01-03 12:00:00',
     'COMPLETED'
 FROM round 
 WHERE no_round = 2;
-INSERT INTO match ( id_match, id_round, dt_scheduled, dt_played, cd_status ) 
+INSERT INTO match ( id_match, id_round, id_season, dt_scheduled, dt_played, cd_status )
 SELECT
     RANDOM_UUID(),
     id_round,
+    id_season,
     TIMESTAMP '2012-01-03 13:00:00',
     TIMESTAMP '2012-01-03 13:00:00',
     'COMPLETED'
 FROM round 
 WHERE no_round = 2;
-INSERT INTO match ( id_match, id_round, dt_scheduled, dt_played, cd_status ) 
+INSERT INTO match ( id_match, id_round, id_season, dt_scheduled, dt_played, cd_status )
 SELECT
     RANDOM_UUID(),
     id_round,
+    id_season,
     TIMESTAMP '2012-01-05 11:30:00',
     TIMESTAMP '2012-01-05 11:00:00',
     NULL
 FROM round 
 WHERE no_round = 3;
-INSERT INTO match ( id_match, id_round, dt_scheduled, dt_played, cd_status ) 
+INSERT INTO match ( id_match, id_round, id_season, dt_scheduled, dt_played, cd_status ) 
 SELECT
     RANDOM_UUID(),
     id_round,
+    id_season,
     TIMESTAMP '2012-01-05 12:30:00',
     TIMESTAMP '2012-01-05 12:00:00',
     NULL
 FROM round 
 WHERE no_round = 3;
 
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'HOME'
 FROM team t, match m
 INNER JOIN round r ON
@@ -76,12 +85,13 @@ WHERE
     t.nm_team = 'The Motherf***ing Meme Team' AND
     r.no_round = 1 AND
     m.dt_played = TIMESTAMP '2012-01-01 12:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'AWAY'
 FROM team t, match m
 INNER JOIN round r ON
@@ -90,12 +100,13 @@ WHERE
     t.nm_team = 'Testers FC' AND
     r.no_round = 1 AND
     m.dt_played = TIMESTAMP '2012-01-01 12:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'HOME'
 FROM team t, match m
 INNER JOIN round r ON
@@ -104,12 +115,13 @@ WHERE
     t.nm_team = 'X' AND
     r.no_round = 1 AND
     m.dt_played = TIMESTAMP '2012-01-02 12:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'AWAY'
 FROM team t, match m
 INNER JOIN round r ON
@@ -118,12 +130,13 @@ WHERE
     t.nm_team = '2KOOL4SKOOL' AND
     r.no_round = 1 AND
     m.dt_played = TIMESTAMP '2012-01-02 12:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'HOME'
 FROM team t, match m
 INNER JOIN round r ON
@@ -132,12 +145,13 @@ WHERE
     t.nm_team = 'The Motherf***ing Meme Team' AND
     r.no_round = 2 AND
     m.dt_played = TIMESTAMP '2012-01-03 12:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'AWAY'
 FROM team t, match m
 INNER JOIN round r ON
@@ -146,12 +160,13 @@ WHERE
     t.nm_team = 'X' AND
     r.no_round = 2 AND
     m.dt_played = TIMESTAMP '2012-01-03 12:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'HOME'
 FROM team t, match m
 INNER JOIN round r ON
@@ -160,12 +175,13 @@ WHERE
     t.nm_team = 'Testers FC' AND
     r.no_round = 2 AND
     m.dt_played = TIMESTAMP '2012-01-03 13:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'AWAY'
 FROM team t, match m
 INNER JOIN round r ON
@@ -174,12 +190,13 @@ WHERE
     t.nm_team = '2KOOL4SKOOL' AND
     r.no_round = 2 AND
     m.dt_played = TIMESTAMP '2012-01-03 13:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'HOME'
 FROM team t, match m
 INNER JOIN round r ON
@@ -188,12 +205,13 @@ WHERE
     t.nm_team = 'The Motherf***ing Meme Team' AND
     r.no_round = 3 AND
     m.dt_played = TIMESTAMP '2012-01-05 11:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'AWAY'
 FROM team t, match m
 INNER JOIN round r ON
@@ -202,12 +220,13 @@ WHERE
     t.nm_team = '2KOOL4SKOOL' AND
     r.no_round = 3 AND
     m.dt_played = TIMESTAMP '2012-01-05 11:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'HOME'
 FROM team t, match m
 INNER JOIN round r ON
@@ -216,12 +235,13 @@ WHERE
     t.nm_team = 'X' AND
     r.no_round = 3 AND
     m.dt_played = TIMESTAMP '2012-01-05 12:00:00';
-INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, cd_team_type )
+INSERT INTO match_team ( id_match_team, id_team, id_match, id_round, id_season, cd_team_type )
 SELECT
     RANDOM_UUID(),
     t.id_team,
     m.id_match,
     r.id_round,
+    r.id_season,
     'AWAY'
 FROM team t, match m
 INNER JOIN round r ON

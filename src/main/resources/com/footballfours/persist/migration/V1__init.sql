@@ -1,7 +1,7 @@
 CREATE TABLE db_info
 (
     cd_parameter VARCHAR( 255 ) PRIMARY KEY,
-    tx_parameter VARCHAR( 255 ) NOT NULL,
+    tx_parameter VARCHAR( 255 ) NOT NULL
 );
 
 CREATE TABLE team
