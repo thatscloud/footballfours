@@ -1,0 +1,49 @@
+{
+    "season": "Summer 2015/2016",
+    "round": 3,
+    "homeTeam":
+    {
+        "name": "The Motherf***ing Meme Team",
+        "players":
+        [
+            "Jack Williams",
+            "Jessica Jones"
+        ],
+        "goals":
+        [
+            {
+                "opponentOwnGoal": true
+            }
+        ],
+        "votes":
+        {
+            "3": "Jessica Jones",
+            "2": "Jack Williams"
+        }
+    },
+    "awayTeam":
+    {
+        "name": "2KOOL4SKOOL",
+        "players":
+        [
+            "William Kelly",
+            "Isabella King",
+            "Ryan Campbell",
+            "Caitlin Davis",
+            "Jacob Roberts",
+            "Grace Hall"
+        ],
+        "goals":
+        [
+            {
+                "scorer": "Grace Hall"
+            }
+        ],
+        "votes":
+        {
+            "3": "William Kelly",
+            "2": "Grace Hall",
+            "1": "Jacob Roberts"
+        }
+    }
+}
