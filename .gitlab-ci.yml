@@ -40,7 +40,7 @@ deploy:
     dependencies:
       - artefact
     script:
-      - sudo /opt/deploy-scripts/deploy-playground build/libs/footballfours-all.jar
+      - sudo /opt/deploy-scripts/deploy-footballfours build/libs/footballfours-all.jar
     environment:
       name: production
       url: $FOOTBALLFOURS_PRODUCTION_URL
