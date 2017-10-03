@@ -1,0 +1,46 @@
+stages:
+  - build
+  - test
+  - artefact
+  - deploy
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+build:
+  stage: build
+  script:
+    - ./gradlew -i -g .gradle classes
+
+test:
+  stage: test
+  script:
+    - ./gradlew -i -g .gradle check
+  artifacts:
+    when: always
+    paths: 
+      - build/reports/tests
+    expire_in: 1 week
+    
+artefact:
+    stage: artefact
+    script:
+      - ./gradlew -i -g .gradle shadowJar
+    artifacts:
+      paths:
+        - build/libs/*-all.jar
+      expire_in: 1 week
+      
+deploy: 
+    stage: deploy
+    only:
+      - master
+    dependencies:
+      - artefact
+    script:
+      - sudo /opt/deploy-scripts/deploy-playground build/libs/footballfours-all.jar
+    environment:
+      name: production
+      url: $FOOTBALLFOURS_PRODUCTION_URL
