@@ -1,37 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-
-  <!-- Basic Page Needs
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta charset="UTF-8">
-  <title>Football Fours - Fixtures / Results</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
-
-  <!-- Mobile Specific Metas
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- FONT
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-
-  <!-- CSS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="stylesheet" href="/css/normalize.css">
-  <link rel="stylesheet" href="/css/skeleton.css">
-
-  <!-- Favicon
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <!--<link rel="icon" type="image/png" href="images/favicon.png"> -->
-   <link rel="stylesheet" href="/css/custom.css">  
-
-</head>
+{{>common/head subtitle="Login"}}
 <body>
-
-  <!-- Primary Page Layout
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <div class="section header">
     <div class="container">
       <div class="row">
@@ -45,10 +15,8 @@
     <div class="container">  
       <h2 class="section-heading">Login</h2>
       <form action="/admin/authenticate" method="post">
-        <div style="text-align: right;" class="six columns">
+        <div class="twelve columns">
           <label for="password">Password:</label>
-        </div>
-        <div class="six columns">
           <input type="password" name="password" id="password"/>
         </div>
         {{#if this}}
@@ -57,8 +25,5 @@
       </form>
     </div>
   </div>
-  
-<!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 </body>
 </html>

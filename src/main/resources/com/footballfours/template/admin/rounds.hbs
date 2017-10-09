@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+{{>common/head subtitle="Rounds"}}
+<body>
+  <div class="section header">
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 class="section-heading">Football Fours</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section currentSeasons">
+    <div class="container">  
+      <h2 class="section-heading">Rounds</h2>
+        {{#each this}}
+          <div class="row">
+              <span class="six columns">{{this.seasonName}}</span>
+              <span class="three columns">{{this.rounds}} round(s)</span>
+              <div class="three columns">
+                <form action="/admin/addRound" method="post">
+                  <input type="hidden" name="seasonId" value="{{this.seasonId}}"/>
+                  <input type="submit" value="Add Round"/>
+                </form>
+              </div>
+          </div>
+        {{/each}}
+    </div>
+  </div>
+</body>
+</html>

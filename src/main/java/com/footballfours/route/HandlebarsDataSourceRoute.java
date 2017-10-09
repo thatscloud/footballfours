@@ -3,28 +3,35 @@ package com.footballfours.route;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.sql.Connection;
+import java.util.function.Function;
 
 import javax.sql.DataSource;
 
-import com.footballfours.model.table.Tables;
-import com.footballfours.model.table.builder.TablesModelBuilder;
 import com.footballfours.persist.RunAgainstDatabase;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
 
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-public class TablesRoute implements Route
+public class HandlebarsDataSourceRoute implements Route
 {
+    private final Handlebars myHandlebars;
     private final DataSource myDataSource;
+    private final String myTemplateName;
+    private final Function<Connection, Object> myModelGenerator;
 
-    public TablesRoute( final DataSource dataSource )
+    public HandlebarsDataSourceRoute( final Handlebars handlebars,
+                                      final DataSource dataSource,
+                                      final String templateName,
+                                      final Function<Connection, Object> modelGenerator )
     {
+        myHandlebars = handlebars;
         myDataSource = dataSource;
+        myTemplateName = templateName;
+        myModelGenerator = modelGenerator;
     }
 
     @Override
@@ -35,15 +42,12 @@ public class TablesRoute implements Route
         {
             try
             {
-                final Tables tables  =
-                    TablesModelBuilder.getTablesFromConnection( connection );
-                final TemplateLoader templateLoader =
-                    new ClassPathTemplateLoader( "/com/footballfours/template" );
-                final Handlebars handlebars = new Handlebars( templateLoader );
-                final Template template = handlebars.compile( "tables" );
+                final Object model = myModelGenerator.apply( connection );
+                final Template template =
+                    myHandlebars.compile( myTemplateName );
                 try( final Writer writer = response.raw().getWriter() )
                 {
-                    template.apply( tables, writer );
+                    template.apply( model, writer );
                 }
             }
             catch( final Exception e )

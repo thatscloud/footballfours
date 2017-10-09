@@ -94,6 +94,16 @@ body > .section:last-child {
   margin-right: auto;
 }
 
+.section:nth-child(2n+1) input {
+  background-color: #777777;
+  color: #F7F7F7;
+}
+
+.section:nth-child(2n+1) select {
+  background-color: #777777;
+  color: #F7F7F7;
+}
+
 /* Mobile */
 @media (max-width: 400px) {
   .leaguetable td,

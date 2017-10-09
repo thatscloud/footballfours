@@ -1,8 +1,11 @@
 package com.footballfours;
 
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static spark.Spark.before;
 import static spark.Spark.get;
+import static spark.Spark.halt;
 import static spark.Spark.post;
 
 import java.io.File;
@@ -13,21 +16,51 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.security.MessageDigest;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.Server;
+import org.hibernate.jpa.boot.spi.Bootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.footballfours.entity.Match;
+import com.footballfours.entity.MatchTeam;
+import com.footballfours.entity.Parameter;
+import com.footballfours.entity.Parameter_;
+import com.footballfours.entity.Round;
+import com.footballfours.entity.Round_;
+import com.footballfours.entity.Season;
+import com.footballfours.entity.Team;
+import com.footballfours.entity.constant.MatchTeamTeamTypeCode;
+import com.footballfours.entity.constant.ParameterParameterCode;
+import com.footballfours.model.admin.matches.builder.MatchesModelBuilder;
+import com.footballfours.model.admin.seasons.builder.SeasonsModelBuilder;
+import com.footballfours.model.admin.teams.builder.TeamsModelBuilder;
 import com.footballfours.model.fixture.builder.FixturesModelBuilder;
+import com.footballfours.model.rounds.builder.RoundsModelBuilder;
 import com.footballfours.model.table.builder.TablesModelBuilder;
+import com.footballfours.persist.RunAgainstDatabase;
 import com.footballfours.route.HandlebarsRouteFactory;
 import com.footballfours.route.StaticContentRoute;
+import com.footballfours.util.PersistenceUnitInfoUtils;
+import com.footballfours.util.UrlCodecUtils;
 
 import spark.Session;
 
@@ -75,6 +108,13 @@ public class Main
         flyway.setLocations( "classpath:com/footballfours/persist/migration" );
         flyway.migrate();
 
+        final EntityManagerFactory entityManagerFactory =
+            Bootstrap.getEntityManagerFactoryBuilder(
+                    PersistenceUnitInfoUtils.createPersistenceUnitInfo( connectionPool ),
+                    Collections.emptyMap() )
+                .withDataSource( connectionPool )
+                .build();
+
         final String adminAuth;
         try
         {
@@ -111,7 +151,8 @@ public class Main
 
         final HandlebarsRouteFactory hbRouteFactory =
             new HandlebarsRouteFactory( "/com/footballfours/template",
-                                        connectionPool );
+                                        connectionPool,
+                                        entityManagerFactory );
 
         before( ( req, res ) ->
         {
@@ -127,6 +168,11 @@ public class Main
         } );
         before( "/admin/*", ( req, res ) ->
         {
+            if( req.splat().length == 0 )
+            {
+                res.redirect( "/admin/index.html", 302 );
+                halt();
+            }
             if( !Objects.equals( req.splat()[0], "login.html" ) &&
                 !Objects.equals( req.splat()[0], "authenticate" ) &&
                 !Objects.equals( req.splat()[0], "logout.html" ) )
@@ -138,6 +184,7 @@ public class Main
                         Boolean.TRUE ) )
                 {
                     res.redirect( "/admin/login.html", 302 );
+                    halt();
                 }
             }
         } );
@@ -150,6 +197,7 @@ public class Main
                     Boolean.TRUE ) )
             {
                 res.redirect( "/admin/index.html", 302 );
+                halt();
             }
         } );
         before( "/admin/logout.html", ( req, res ) ->
@@ -173,6 +221,8 @@ public class Main
              hbRouteFactory.from(
                  "tables",
                  TablesModelBuilder::getTablesFromConnection ) );
+        get( "/rulessummary.html",
+            hbRouteFactory.from( "rulessummary", c -> new Object() ) );
         get( "/admin", ( req, res ) ->
         {
             res.redirect( "/admin/index.html", 302 );
@@ -185,11 +235,8 @@ public class Main
                  .from( "admin/login", c ->
                      Objects.equals( req.queryParams( "failed" ), "true" ) )
                  .handle( req, res ) );
-        get( "/admin/logout.html", ( req, res ) ->
-        hbRouteFactory
-            .from( "admin/logout", c ->
-                Objects.equals( req.queryParams( "failed" ), "true" ) )
-            .handle( req, res ) );
+        get( "/admin/logout.html",
+             hbRouteFactory.from( "admin/logout", c -> new Object() ) );
         post( "/admin/authenticate", ( req, res ) ->
         {
             final String password = req.queryParams( "password" );
@@ -213,6 +260,199 @@ public class Main
                 res.redirect( "/admin/login.html?failed=true" );
             }
             return res;
+        } );
+        get( "/admin/seasons.html",
+            ( req, res ) ->
+            hbRouteFactory
+                .fromJpa( "/admin/seasons",
+                          em ->
+                          {
+                              final HashMap<String, Object> context = new HashMap<>();
+                              context.put( "seasons",
+                                           SeasonsModelBuilder.getSeasonsFromEntityManager( em ) );
+                              if( isNotEmpty( req.queryParams( "error" ) ) )
+                              {
+                                  context.put( "error", req.queryParams( "error" ) );
+                              }
+                              return context;
+                          } )
+                .handle( req, res ) );
+        post( "/admin/seasons", ( req, res ) ->
+        {
+            if( StringUtils.isBlank( req.queryParams( "seasonName" ) ) )
+            {
+                    res.redirect( "/admin/seasons.html?error=" +
+                                  UrlCodecUtils.encode( "Season name cannot be blank." ) );
+                    halt();
+            }
+            RunAgainstDatabase.run( connectionPool, connection ->
+            {
+                try( final PreparedStatement statement =
+                         connection.prepareStatement(
+                             "INSERT INTO season " +
+                             "( " +
+                             "    id_season," +
+                             "    nm_season " +
+                             ") " +
+                             "VALUES " +
+                             "( " +
+                             "    RANDOM_UUID(), " +
+                             "    ? " +
+                             ")" ) )
+                {
+                    statement.setString( 1, StringUtils.strip( req.queryParams( "seasonName" ) ) );
+                    statement.executeUpdate();
+                }
+                catch( final SQLException e )
+                {
+                    res.redirect( "/admin/seasons.html?error=" +
+                                  UrlCodecUtils.encode( e.getMessage() ) );
+                    halt();
+                }
+            } );
+            res.redirect( "/admin/seasons.html" );
+            return null;
+        } );
+        get( "/admin/rounds.html",
+            hbRouteFactory.from( "admin/rounds",
+                                 RoundsModelBuilder::getSeasonRoundsFromConnection ) );
+        post( "/admin/addRound", ( req, res ) ->
+        {
+            RunAgainstDatabase.run( entityManagerFactory, entityManager ->
+            {
+                final Season season =
+                    entityManager.find( Season.class,
+                                        UUID.fromString( req.queryParams( "seasonId" ) ) );
+
+                final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+                final CriteriaQuery<Integer> criteriaQuery =
+                    criteriaBuilder.createQuery( Integer.class );
+                final Root<Round> round = criteriaQuery.from( Round.class );
+                criteriaQuery.where( criteriaBuilder.equal( round.get( Round_.season ), season ) );
+                criteriaQuery.select( criteriaBuilder.max( round.get( Round_.roundNumber ) ) );
+                final Optional<Integer> maxRoundNumber =
+                    Optional.ofNullable(
+                        entityManager.createQuery( criteriaQuery ).getSingleResult() );
+
+                final Round newRound = new Round();
+                newRound.setRoundNumber( maxRoundNumber.orElse( 0 ) + 1 );
+                newRound.setSeason( season );
+                entityManager.persist( newRound );
+            } );
+            res.redirect( "/admin/rounds.html" );
+            return null;
+        } );
+        get( "/admin/teams.html",
+            ( req, res ) ->
+                hbRouteFactory.fromJpa(
+                        "admin/teams",
+                        entityManager ->
+                            TeamsModelBuilder.getTeamsModelFromEntityManager(
+                                entityManager,
+                                isBlank( req.queryParams( "seasonId" ) ) ?
+                                    null :
+                                    UUID.fromString ( req.queryParams( "seasonId" ) ) ) )
+                    .handle( req, res ) );
+        post( "/admin/addTeam", ( req, res ) ->
+        {
+            RunAgainstDatabase.run( entityManagerFactory, entityManager ->
+            {
+                final Season season =
+                    entityManager.find( Season.class,
+                                        UUID.fromString( req.queryParams( "seasonId" ) ) );
+                final Team team = new Team();
+                team.setSeason( season );
+                team.setTeamName( StringUtils.strip( req.queryParams( "teamName" ) ) );
+                entityManager.persist( team );
+            } );
+            res.redirect( "/admin/teams.html?seasonId=" +
+                              UrlCodecUtils.encode( req.queryParams( "seasonId" ) ) );
+            return null;
+        } );
+        get( "/admin/matches.html",
+            ( req, res ) ->
+                hbRouteFactory.fromJpa(
+                        "admin/matches",
+                        entityManager ->
+                            MatchesModelBuilder.getMatchesModelFromEntityManager(
+                                entityManager,
+                                isBlank( req.queryParams( "seasonId" ) ) ?
+                                    null :
+                                    UUID.fromString ( req.queryParams( "seasonId" ) ) ) )
+                    .handle( req, res ) );
+        post( "/admin/addMatch", ( req, res ) ->
+        {
+            RunAgainstDatabase.run( entityManagerFactory, entityManager ->
+            {
+                final Season season =
+                    entityManager.find( Season.class,
+                                        UUID.fromString( req.queryParams( "seasonId" ) ) );
+                final Round round =
+                    entityManager.find( Round.class,
+                                        UUID.fromString( req.queryParams( "roundId" ) ) );
+                final Team homeTeam =
+                    entityManager.find( Team.class,
+                                        UUID.fromString( req.queryParams( "homeTeamId" ) ) );
+                final Team awayTeam =
+                    entityManager.find( Team.class,
+                                        UUID.fromString( req.queryParams( "awayTeamId" ) ) );
+
+                final Match match = new Match();
+                match.setRound( round );
+                match.setSeason( season );
+                match.setScheduledDateTime(
+                    LocalDateTime.parse( req.queryParams( "scheduledDateTime" ) )
+                        .atZone( ZoneId.of( "Australia/NSW" ) )
+                        .toInstant() );
+                match.setPlayedDateTime(
+                    LocalDateTime.parse( req.queryParams( "playedDateTime" ) )
+                        .atZone( ZoneId.of( "Australia/NSW" ) )
+                        .toInstant() );
+
+                entityManager.persist( match );
+
+                final MatchTeam homeMatchTeam = new MatchTeam();
+                homeMatchTeam.setRound( round );
+                homeMatchTeam.setSeason( season );
+                homeMatchTeam.setTeam( homeTeam );
+                homeMatchTeam.setMatch( match );
+                homeMatchTeam.setTeamTypeCode( MatchTeamTeamTypeCode.HOME );
+
+                final MatchTeam awayMatchTeam = new MatchTeam();
+                awayMatchTeam.setRound( round );
+                awayMatchTeam.setSeason( season );
+                awayMatchTeam.setTeam( awayTeam );
+                awayMatchTeam.setMatch( match );
+                awayMatchTeam.setTeamTypeCode( MatchTeamTeamTypeCode.AWAY );
+
+                entityManager.persist( homeMatchTeam );
+                entityManager.persist( awayMatchTeam );
+            } );
+            res.redirect( "/admin/matches.html?seasonId=" +
+                              UrlCodecUtils.encode( req.queryParams( "seasonId" ) ) );
+            return null;
+        } );
+        post( "/admin/setCurrentSeason", ( req, res ) ->
+        {
+            RunAgainstDatabase.run( entityManagerFactory, entityManager ->
+            {
+                final Season season =
+                    entityManager.find( Season.class,
+                                        UUID.fromString( req.queryParams( "seasonId" ) ) );
+
+                final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+                final CriteriaQuery<Parameter> parameterCriteriaQuery =
+                    criteriaBuilder.createQuery( Parameter.class );
+                final Root<Parameter> parameterRoot = parameterCriteriaQuery.from( Parameter.class );
+                parameterCriteriaQuery.where(
+                    criteriaBuilder.equal( parameterRoot.get( Parameter_.parameterCode ),
+                                           ParameterParameterCode.CURRENT_SEASON ) );
+                final Parameter parameter =
+                    entityManager.createQuery( parameterCriteriaQuery ).getSingleResult();
+                parameter.setParameterText( season.getSeasonId().toString() );
+            } );
+            res.redirect( "/admin/seasons.html" );
+            return null;
         } );
         get( "/*", new StaticContentRoute() );
     }

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{>common/headcontents subtitle="Seasons"}}
+  <script>
+    $( document ).ready( function()
+    {
+      $( ".setCurrentSeasonLink" ).click( function()
+      {
+        $( this ).parent().submit();
+        return false;
+      } );
+    } );
+  </script>
+</head>
+<body>
+  <div class="section header">
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 class="section-heading">Football Fours</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section seasons">
+    <div class="container">  
+      <h2 class="section-heading">Seasons</h2>
+      <div class="twelve columns">
+        {{#each seasons}}
+          <div class="row">
+            <div class="six columns">{{this.seasonName}}</div>
+            {{#if this.selected}}
+              <div class="six columns">Current Active Season</div>
+            {{else}}
+              <div class="six columns">
+                <form style="margin-bottom: 0;" action="/admin/setCurrentSeason" method="post">
+                  <input type="hidden" name="seasonId" value="{{this.seasonId}}"/>
+                  <a href="#" class="setCurrentSeasonLink">Set as Active Season</a>
+                </form>
+              </div>
+            {{/if}}
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+  <div class="section newSeason">
+    <div class="container">  
+      <h2 class="section-heading">New Season</h2>
+      <form action="/admin/seasons" method="post">
+        <div class="twelve columns">
+          <label for="seasonName">Season Name:</label>
+          <input type="seasonName" name="seasonName" id="seasonName"/>
+        </div>
+        {{#if error}}
+          <span class="twelve columns">{{error}}</span>
+        {{/if}}
+        <div class="twelve columns">
+          <input type="submit" value="Create Season"/>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

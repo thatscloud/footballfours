@@ -4,7 +4,7 @@ import java.sql.Connection;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 
-import com.footballfours.persist.RunAgainstDataSource;
+import com.footballfours.persist.RunAgainstDatabase;
 
 public abstract class BatchTask implements Runnable
 {
@@ -25,7 +25,7 @@ public abstract class BatchTask implements Runnable
             "jdbc:h2:tcp://localhost:4569/./footballfours;CIPHER=AES",
             sqlUsername,
             encryptionPassword + " " + sqlPassword );
-        RunAgainstDataSource.run( connectionPool, connection ->
+        RunAgainstDatabase.run( connectionPool, connection ->
         {
             try
             {
