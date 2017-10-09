@@ -3,12 +3,12 @@ package com.footballfours.route;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
-import java.sql.Connection;
 import java.util.function.Function;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
-import com.footballfours.persist.RunAgainstDataSource;
+import com.footballfours.persist.RunAgainstDatabase;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 
@@ -16,21 +16,21 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-public class HandlebarsRoute implements Route
+public class HandlebarsEntityManagerFactoryRoute implements Route
 {
-
     private final Handlebars myHandlebars;
-    private final DataSource myDataSource;
+    private final EntityManagerFactory myEntityManagerFactory;
     private final String myTemplateName;
-    private final Function<Connection, Object> myModelGenerator;
+    private final Function<EntityManager, Object> myModelGenerator;
 
-    public HandlebarsRoute( final Handlebars handlebars,
-                            final DataSource dataSource,
-                            final String templateName,
-                            final Function<Connection, Object> modelGenerator )
+    public HandlebarsEntityManagerFactoryRoute(
+        final Handlebars handlebars,
+        final EntityManagerFactory entityManagerFactory,
+        final String templateName,
+        final Function<EntityManager, Object> modelGenerator )
     {
         myHandlebars = handlebars;
-        myDataSource = dataSource;
+        myEntityManagerFactory = entityManagerFactory;
         myTemplateName = templateName;
         myModelGenerator = modelGenerator;
     }
@@ -39,12 +39,13 @@ public class HandlebarsRoute implements Route
     public Object handle( final Request request, final Response response )
         throws Exception
     {
-        RunAgainstDataSource.run( myDataSource, connection ->
+        RunAgainstDatabase.run( myEntityManagerFactory, entityManager ->
         {
             try
             {
-                final Object model = myModelGenerator.apply( connection );
-                final Template template = myHandlebars.compile( myTemplateName );
+                final Object model = myModelGenerator.apply( entityManager );
+                final Template template =
+                    myHandlebars.compile( myTemplateName );
                 try( final Writer writer = response.raw().getWriter() )
                 {
                     template.apply( model, writer );

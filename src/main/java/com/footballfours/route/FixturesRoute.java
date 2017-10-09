@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 
 import com.footballfours.model.fixture.Round;
 import com.footballfours.model.fixture.builder.FixturesModelBuilder;
-import com.footballfours.persist.RunAgainstDataSource;
+import com.footballfours.persist.RunAgainstDatabase;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
@@ -32,7 +32,7 @@ public class FixturesRoute implements Route
     public Object handle( final Request request, final Response response )
         throws Exception
     {
-        RunAgainstDataSource.run( myDataSource, connection ->
+        RunAgainstDatabase.run( myDataSource, connection ->
         {
             try
             {

@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-public class RunAgainstDataSource
+public class RunAgainstDatabase
 {
     public static void run( final DataSource dataSource,
                             final Consumer<Connection> consumer )
@@ -178,5 +180,26 @@ public class RunAgainstDataSource
             throw re;
         }
         return returnValue;
+    }
+
+    public static void run( final EntityManagerFactory entityManagerFactory,
+                            final Consumer<EntityManager> consumer )
+    {
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        consumer.accept( em );
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    public static <S> S evaluate( final EntityManagerFactory entityManagerFactory,
+                                  final Function<EntityManager, S> function )
+    {
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        final S s = function.apply( em );
+        em.getTransaction().commit();
+        em.close();
+        return s;
     }
 }

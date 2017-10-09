@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{>common/headcontents subtitle="Teams"}}
+  <script>
+    $( document ).ready( function()
+    {
+      $( "#seasonId > option[value!=\"\"]" ).click( function()
+      {
+        $( "#selectSeasonForm" ).submit();
+      } );
+    } );
+  </script>
+</head>
+<body>
+  <div class="section header">
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 class="section-heading">Football Fours</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section teams">
+    <div class="container">  
+      <h2 class="section-heading">Teams</h2>
+      <form id="selectSeasonForm" method="get" action="/admin/teams.html">
+        <div class="row">
+          <div class="twelve columns">
+            <label for="seasonId">Season:</label>
+            <select name="seasonId" id="seasonId">
+               {{#unless seasonTeams}}
+                 <option value=""></option>
+               {{/unless}}
+               {{#each seasons}}
+                {{#if this.selected}}
+                  <option selected="selected" value="{{this.seasonId}}">{{this.seasonName}}</option>
+                {{else}}
+                  <option value="{{this.seasonId}}">{{this.seasonName}}</option>
+                {{/if}}
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </form>
+      {{#if seasonTeams}}
+        {{#if seasonTeams.teams}}
+          <span class="twelve columns">Current Teams:</span>
+          {{#each seasonTeams.teams}}
+            <span class="twelve columns">{{this}}</span>
+          {{/each}}
+        {{else}}
+          <span class="twelve columns">This season currently has no teams.</span>
+        {{/if}}
+      {{/if}}
+    </div>
+  </div>
+  {{#if seasonTeams}}
+    <div class="section addTeam">
+      <div class="container">
+        <h2 class="section-heading">Add new team</h2>
+        <form method="post" action="/admin/addTeam">
+          <div class="row">
+            <div class="six columns">
+              <label for="teamName">Team Name:</label>
+              <input class="u-full-width" type="text" name="teamName" id="teamName"/>
+             </div>
+            <input type="hidden" name="seasonId" value="{{seasonTeams.season.seasonId}}"/>
+          </div>
+          <input type="submit" value="Add Team"/>
+        </form>
+      </div>
+    </div>
+  {{/if}}
+</body>
+</html>

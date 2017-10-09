@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{>common/headcontents subtitle="Matches"}}
+  <script>
+    $( document ).ready( function()
+    {
+      $( "#seasonId > option[value!=\"\"]" ).click( function()
+      {
+        $( "#selectSeasonForm" ).submit();
+      } );
+    } );
+  </script>
+</head>
+<body>
+  <div class="section header">
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 class="section-heading">Football Fours</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section matches">
+    <div class="container">  
+      <h2 class="section-heading">Matches</h2>
+      <form id="selectSeasonForm" method="get" action="/admin/matches.html">
+        <div class="row">
+          <div class="twelve columns">
+            <label for="seasonId">Season:</label>
+            <select name="seasonId" id="seasonId">
+               {{#unless seasonTeams}}
+                 <option value=""></option>
+               {{/unless}}
+               {{#each seasons}}
+                {{#if this.selected}}
+                  <option selected="selected" value="{{this.seasonId}}">{{this.seasonName}}</option>
+                {{else}}
+                  <option value="{{this.seasonId}}">{{this.seasonName}}</option>
+                {{/if}}
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </form>
+      {{#if seasonMatches}}
+        {{#if seasonMatches.matches}}
+          <span class="twelve columns">Current Matches:</span>
+          <table class="u-full-width">
+            <thead>
+             <tr>
+               <th>Round</th>
+               <th>Home Team</th>
+               <th>Away Team</th>
+               <th>Scheduled</th>
+               <th>Played</th>
+             </tr>
+            </thead>
+            <tbody>
+              {{#each seasonMatches.matches}}
+                <tr>
+                  <td>{{this.roundNumber}}</td>
+                  <td>{{this.homeTeam}}</td>
+                  <td>{{this.awayTeam}}</td>
+                  <td>{{this.scheduledDateTimeString}}</td>
+                  <td>{{this.playedDateTimeString}}</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        {{else}}
+          <span class="twelve columns">This season currently has no matches.</span>
+        {{/if}}
+      {{/if}}
+    </div>
+  </div>
+  {{#if seasonMatches}}
+    <div class="section addMatch">
+      <div class="container">
+        <h2 class="section-heading">Add new match</h2>
+        <form method="post" action="/admin/addMatch">
+          <div class="row">
+            <div class="two columns">
+              <label for="roundId">Round:</label>
+              <select class="u-full-width" id="roundId" name="roundId">
+                {{#each seasonMatches.rounds}}
+                  <option value="{{this.roundId}}">{{this.roundNumber}}</option>
+                {{/each}}
+              </select>
+             </div>
+             <div class="five columns">
+              <label for="homeTeamId">Home Team:</label>
+              <select class="u-full-width" id="homeTeamId" name="homeTeamId">
+                {{#each seasonMatches.teams}}
+                  <option value="{{this.teamId}}">{{this.teamName}}</option>
+                {{/each}}
+              </select>
+             </div>
+             <div class="five columns">
+              <label for="awayTeamId">Away Team:</label>
+              <select class="u-full-width" id="awayTeamId" name="awayTeamId">
+                {{#each seasonMatches.teams}}
+                  <option value="{{this.teamId}}">{{this.teamName}}</option>
+                {{/each}}
+              </select>
+             </div>
+          </div>
+          <div class="row">
+            <div class="six columns">
+              <label for="scheduledDateTime">Scheduled:</label>
+              <input class="u-full-width" type="datetime-local" id="scheduledDateTime" name="scheduledDateTime"/>
+            </div>
+            <div class="six columns">
+              <label for="playedDateTime">Played:</label>
+              <input class="u-full-width" type="datetime-local" id="playedDateTime" name="playedDateTime"/>
+            </div>
+          </div>
+          <input type="hidden" name="seasonId" value="{{seasonMatches.season.seasonId}}"/>
+          <input type="submit" value="Add Match"/>
+        </form>
+      </div>
+    </div>
+  {{/if}}
+</body>
+</html>

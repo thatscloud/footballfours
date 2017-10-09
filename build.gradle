@@ -2,6 +2,7 @@ plugins {
   id 'java'
   id 'application'
   id 'com.github.johnrengelman.shadow' version '1.2.2'
+  id 'net.ltgt.apt' version '0.10'
 }
 
 repositories {
@@ -18,6 +19,10 @@ dependencies {
     compile 'org.apache.commons:commons-csv:1.2'
     compile 'org.flywaydb:flyway-core:4.0.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
+    compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+    compile 'org.hibernate:hibernate-core:5.2.10.Final'
+    apt 'org.hibernate:hibernate-jpamodelgen:5.2.10.Final'
+    compileOnly 'org.hibernate:hibernate-jpamodelgen:5.2.10.Final'
     testCompile 'org.testng:testng:6.9.10'
 }
 
