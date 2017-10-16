@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{>common/headcontents subtitle="Players"}}
+  <script>
+    $( document ).ready( function()
+    {
+      $( "#seasonId > option[value!=\"\"]" ).click( function()
+      {
+        $( "#selectSeasonForm" ).submit();
+      } );
+      $( "#teamId > option[value!=\"\"]" ).click( function()
+      {
+        $( "#selectTeamForm" ).submit();
+      } );
+    } );
+  </script>
+</head>
+<body>
+  <div class="section header">
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 class="section-heading">Football Fours</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section players">
+    <div class="container">  
+      <h2 class="section-heading">Players</h2>
+      <form id="selectSeasonForm" method="get" action="/admin/players.html">
+        <div class="row">
+          <div class="twelve columns">
+            <label for="seasonId">Season:</label>
+            <select name="seasonId" id="seasonId">
+               {{#unless teams}}
+                 <option value=""></option>
+               {{/unless}}
+               {{#each seasons}}
+                {{#if this.selected}}
+                  <option selected="selected" value="{{this.seasonId}}">{{this.seasonName}}</option>
+                {{else}}
+                  <option value="{{this.seasonId}}">{{this.seasonName}}</option>
+                {{/if}}
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </form>
+      {{#if teams}}
+        <form id="selectTeamForm" method="get" action="/admin/players.html">
+          <div class="row">
+             <div class="twelve columns">
+             <label for="seasonId">Team:</label>
+              <select name="teamId" id="teamId">
+                 {{#unless seasonTeamPlayers}}
+                   <option value=""></option>
+                 {{/unless}}
+                 {{#each teams}}
+                  {{#if this.selected}}
+                    <option selected="selected" value="{{this.teamId}}">{{this.teamName}}</option>
+                  {{else}}
+                    <option value="{{this.teamId}}">{{this.teamName}}</option>
+                  {{/if}}
+                {{/each}}
+              </select>
+              <input name="seasonId" type="hidden" value="{{selectedSeason.seasonId}}"/>
+            </div>
+          </div>
+        </form>
+      {{/if}}
+      {{#if seasonTeamPlayers}}
+        {{#if seasonTeamPlayers.playerNames}}
+          <span class="twelve columns">Current Players:</span>
+          {{#each seasonTeamPlayers.playerNames}}
+            <span class="twelve columns">{{this}}</span>
+          {{/each}}
+        {{else}}
+          <span class="twelve columns">This team currently has no players.</span>
+        {{/if}}
+      {{/if}}
+    </div>
+  </div>
+  {{#if seasonTeamPlayers}}
+    <div class="section addPlayer">
+      <div class="container">
+        <h2 class="section-heading">Add new player</h2>
+        <form method="post" action="/admin/addPlayer">
+          <div class="row">
+            <div class="six columns">
+              <label for="teamName">Given Name:</label>
+              <input class="u-full-width" type="text" name="givenName" id="givenName"/>
+             </div>
+             <div class="six columns">
+              <label for="teamName">Family Name:</label>
+              <input class="u-full-width" type="text" name="familyName" id="familyName"/>
+             </div>
+            <input type="hidden" name="seasonId" value="{{seasonTeamPlayers.season.seasonId}}"/>
+            <input type="hidden" name="teamId" value="{{seasonTeamPlayers.team.teamId}}"/>
+          </div>
+          <input type="submit" value="Add Player"/>
+        </form>
+      </div>
+    </div>
+  {{/if}}
+</body>
+</html>

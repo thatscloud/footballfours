@@ -3,6 +3,7 @@ package com.footballfours.model.admin.matches;
 import java.util.List;
 
 import com.footballfours.model.admin.common.SeasonModel;
+import com.footballfours.model.admin.common.TeamModel;
 
 public class SeasonMatchesModel
 {

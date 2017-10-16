@@ -22,10 +22,10 @@ import com.footballfours.entity.Team;
 import com.footballfours.entity.Team_;
 import com.footballfours.model.admin.MatchesModel;
 import com.footballfours.model.admin.common.SeasonModel;
+import com.footballfours.model.admin.common.TeamModel;
 import com.footballfours.model.admin.matches.MatchModel;
 import com.footballfours.model.admin.matches.RoundModel;
 import com.footballfours.model.admin.matches.SeasonMatchesModel;
-import com.footballfours.model.admin.matches.TeamModel;
 
 public class MatchesModelBuilder
 {

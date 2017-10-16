@@ -1,4 +1,4 @@
-package com.footballfours.model.admin.matches;
+package com.footballfours.model.admin.common;
 
 import java.util.UUID;
 
@@ -6,6 +6,7 @@ public class TeamModel
 {
     private UUID myTeamId;
     private String myTeamName;
+    private boolean mySelected;
 
     public UUID getTeamId()
     {
@@ -25,5 +26,15 @@ public class TeamModel
     public void setTeamName( final String teamName )
     {
         myTeamName = teamName;
+    }
+
+    public boolean isSelected()
+    {
+        return mySelected;
+    }
+
+    public void setSelected( final boolean selected )
+    {
+        mySelected = selected;
     }
 }
