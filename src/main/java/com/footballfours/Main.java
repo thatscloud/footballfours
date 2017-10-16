@@ -1,5 +1,6 @@
 package com.footballfours;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -44,6 +45,8 @@ import com.footballfours.entity.Match;
 import com.footballfours.entity.MatchTeam;
 import com.footballfours.entity.Parameter;
 import com.footballfours.entity.Parameter_;
+import com.footballfours.entity.Player;
+import com.footballfours.entity.Player_;
 import com.footballfours.entity.Round;
 import com.footballfours.entity.Round_;
 import com.footballfours.entity.Season;
@@ -51,6 +54,7 @@ import com.footballfours.entity.Team;
 import com.footballfours.entity.constant.MatchTeamTeamTypeCode;
 import com.footballfours.entity.constant.ParameterParameterCode;
 import com.footballfours.model.admin.matches.builder.MatchesModelBuilder;
+import com.footballfours.model.admin.players.builder.PlayersModelBuilder;
 import com.footballfours.model.admin.seasons.builder.SeasonsModelBuilder;
 import com.footballfours.model.admin.teams.builder.TeamsModelBuilder;
 import com.footballfours.model.fixture.builder.FixturesModelBuilder;
@@ -452,6 +456,56 @@ public class Main
                 parameter.setParameterText( season.getSeasonId().toString() );
             } );
             res.redirect( "/admin/seasons.html" );
+            return null;
+        } );
+        get( "/admin/players.html",
+            ( req, res ) ->
+                hbRouteFactory.fromJpa(
+                        "admin/players",
+                        entityManager ->
+                            PlayersModelBuilder.getPlayersModelFromEntityManager(
+                                entityManager,
+                                isBlank( req.queryParams( "seasonId" ) ) ?
+                                    null :
+                                    UUID.fromString ( req.queryParams( "seasonId" ) ),
+                                isBlank( req.queryParams( "teamId" ) ) ?
+                                    null :
+                                    UUID.fromString ( req.queryParams( "teamId" ) ) ) )
+                    .handle( req, res ) );
+        post( "/admin/addPlayer", ( req, res ) ->
+        {
+            RunAgainstDatabase.run( entityManagerFactory, entityManager ->
+            {
+                requireNonNull( entityManager.find(
+                    Season.class,
+                    UUID.fromString( req.queryParams( "seasonId" ) ) ) );
+                final Team team =
+                    requireNonNull( entityManager.find(
+                        Team.class,
+                        UUID.fromString( req.queryParams( "teamId" ) ) ) );
+
+                final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+                final CriteriaQuery<Integer> criteriaQuery =
+                    criteriaBuilder.createQuery( Integer.class );
+                final Root<Player> player = criteriaQuery.from( Player.class );
+                criteriaQuery.where( criteriaBuilder.equal( player.get( Player_.team ), team ) );
+                criteriaQuery.select(
+                    criteriaBuilder.max( player.get( Player_.teamPlayerNumber ) ) );
+                final Optional<Integer> maxTeamPlayerNumber =
+                    Optional.ofNullable(
+                        entityManager.createQuery( criteriaQuery ).getSingleResult() );
+
+                final Player newPlayer = new Player();
+                newPlayer.setGivenName( req.queryParams( "givenName" ) );
+                newPlayer.setFamilyName( req.queryParams( "familyName" ) );
+                newPlayer.setTeamPlayerNumber( maxTeamPlayerNumber.orElse( 0 ) + 1 );
+                newPlayer.setTeam( team );
+                entityManager.persist( newPlayer );
+            } );
+            res.redirect( "/admin/players.html?seasonId=" +
+                              UrlCodecUtils.encode( req.queryParams( "seasonId" ) ) + "&" +
+                              "teamId=" +
+                              UrlCodecUtils.encode( req.queryParams( "teamId" ) ) );
             return null;
         } );
         get( "/*", new StaticContentRoute() );
