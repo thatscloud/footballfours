@@ -1,5 +1,6 @@
 package com.footballfours.model.admin.matches.builder;
 
+import static com.footballfours.entity.constant.MatchStatusCode.COMPLETED;
 import static java.util.stream.Collectors.toList;
 
 import java.time.ZoneId;
@@ -78,6 +79,8 @@ public class MatchesModelBuilder
                     .map( match ->
                     {
                         final MatchModel matchModel = new MatchModel();
+                        matchModel.setMatchId( match.getMatchId() );
+                        matchModel.setComplete( match.getStatusCode() == COMPLETED );
                         matchModel.setRoundNumber( match.getRound().getRoundNumber() );
                         matchModel.setScheduledDateTimeString(
                             match.getScheduledDateTime()

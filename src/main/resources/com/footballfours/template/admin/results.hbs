@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{>common/headcontents subtitle="Enter Results"}}
+  <style>
+    input[type="number"].goals, input[type="number"].votes {
+      padding-left: 3px;
+      padding-right: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="section header">
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 class="section-heading">Football Fours</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section matches">
+    <div class="container">  
+      <h2 class="section-heading">Enter Results</h2>
+      <div class="row">
+        <div class="twelve columns">
+          {{homeTeamName}} vs {{awayTeamName}}
+        </div
+      </div>
+      <div class="row">
+        <div class="four columns">
+          Round {{roundNumber}}
+        </div>
+        <div class="four columns">
+          Scheduled: {{scheduledDateTime}}
+        </div>
+        <div class="four columns">
+          Played {{playedDateTime}}
+        </div>
+      </div>
+      <form method="post" action="/admin/addResults">
+        <div class="row">
+          <div class="six columns">{{homeTeamName}}</div>
+          <div class="six columns">{{awayTeamName}}</div>
+          <input type="hidden"  name="matchId" value="{{matchId}}"/>
+        </div>
+        <div class="row">
+          <div class="three columns">Name</div>
+          <div class="one column">Present</div>
+          <div class="one column">Votes</div>
+          <div class="one column">Goals</div>
+          <div class="three columns">Name</div>
+          <div class="one column">Present</div>
+          <div class="one column">Votes</div>
+          <div class="one column">Goals</div>
+        </div>
+        {{#each pairedPlayers}}
+          <div class="row">
+            {{#if left}}
+              <div class="three columns">{{left.playerGivenName}} {{left.playerFamilyName}}</div>
+              <input type="hidden" name="homePlayer{{@index}}Id" value="{{left.playerId}}"/>
+              <div class="one column">
+                <input type="checkbox" name="homePlayer{{@index}}Present" value="true"/>
+              </div>
+              <div class="one column">
+                <input class="u-full-width votes" type="number" name="homePlayer{{@index}}Votes"/>
+              </div>
+              <div class="one column">
+                <input class="u-full-width goals" type="number" name="homePlayer{{@index}}Goals"/>
+              </div>
+            {{else}}
+              <div class="six colums"> </div>
+            {{/if}}
+            {{#if right}}
+              <div class="three columns">{{right.playerGivenName}} {{right.playerFamilyName}}</div>
+              <input type="hidden" name="awayPlayer{{@index}}Id" value="{{right.playerId}}"/>
+              <div class="one column">
+                <input type="checkbox" name="awayPlayer{{@index}}Present" value="true"/>
+              </div>
+              <div class="one column">
+                <input class="u-full-width votes" type="number" name="awayPlayer{{@index}}Votes"/>
+              </div>
+              <div class="one column">
+                <input class="u-full-width goals" type="number" name="awayPlayer{{@index}}Goals"/>
+              </div>
+            {{else}}
+              <div class="six columns"> </div>
+            {{/if}}
+          </div>
+        {{/each}}
+        <div class="row">
+          <div class="five columns">Opponent Own Goals</div>
+          <div class="one column">
+            <input class="u-full-width goals" type="number" name="homeOpponentOwnGoals"/>
+          </div>
+          <div class="five columns">Opponent Own Goals</div>
+          <div class="one column">
+            <input class="u-full-width goals" type="number" name="awayOpponentOwnGoals"/>
+          </div>
+        </div>
+        <div class="row">
+          <input type="submit" value="Submit"/>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
