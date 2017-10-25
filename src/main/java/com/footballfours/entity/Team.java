@@ -1,6 +1,8 @@
 package com.footballfours.entity;
 
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -9,7 +11,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.SortComparator;
 
 @Entity
 @Table( name = "team" )
@@ -18,6 +23,7 @@ public class Team
     private UUID myTeamId;
     private String myTeamName;
     private Season mySeason;
+    private SortedSet<Player> myPlayers;
 
     @Id
     @GeneratedValue
@@ -53,6 +59,37 @@ public class Team
     public void setSeason( final Season season )
     {
         mySeason = season;
+    }
+
+    public static class PlayerSortComparator implements Comparator<Player>
+    {
+        @Override
+        public int compare( final Player o1, final Player o2 )
+        {
+            if( o1 == null )
+            {
+                return o2 == null ? 0 : 1;
+            }
+
+            if( o2 == null )
+            {
+                return -1;
+            }
+
+            return Integer.compare( o1.getTeamPlayerNumber(), o2.getTeamPlayerNumber() );
+        }
+    }
+
+    @OneToMany( mappedBy = "team" )
+    @SortComparator( PlayerSortComparator.class )
+    public SortedSet<Player> getPlayers()
+    {
+        return myPlayers;
+    }
+
+    public void setPlayers( final SortedSet<Player> players )
+    {
+        myPlayers = players;
     }
 
     @Override

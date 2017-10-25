@@ -1,8 +1,11 @@
 package com.footballfours;
 
+import static java.lang.Integer.parseInt;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static spark.Spark.before;
 import static spark.Spark.get;
@@ -27,13 +30,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.apache.commons.lang3.tuple.Pair;
 import org.flywaydb.core.Flyway;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.Server;
@@ -41,8 +51,11 @@ import org.hibernate.jpa.boot.spi.Bootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.footballfours.entity.Goal;
+import com.footballfours.entity.GoldenBallVote;
 import com.footballfours.entity.Match;
 import com.footballfours.entity.MatchTeam;
+import com.footballfours.entity.MatchTeamPlayer;
 import com.footballfours.entity.Parameter;
 import com.footballfours.entity.Parameter_;
 import com.footballfours.entity.Player;
@@ -51,10 +64,12 @@ import com.footballfours.entity.Round;
 import com.footballfours.entity.Round_;
 import com.footballfours.entity.Season;
 import com.footballfours.entity.Team;
+import com.footballfours.entity.constant.MatchStatusCode;
 import com.footballfours.entity.constant.MatchTeamTeamTypeCode;
 import com.footballfours.entity.constant.ParameterParameterCode;
 import com.footballfours.model.admin.matches.builder.MatchesModelBuilder;
 import com.footballfours.model.admin.players.builder.PlayersModelBuilder;
+import com.footballfours.model.admin.results.builder.ResultsModelBuilder;
 import com.footballfours.model.admin.seasons.builder.SeasonsModelBuilder;
 import com.footballfours.model.admin.teams.builder.TeamsModelBuilder;
 import com.footballfours.model.fixture.builder.FixturesModelBuilder;
@@ -508,6 +523,161 @@ public class Main
                               UrlCodecUtils.encode( req.queryParams( "teamId" ) ) );
             return null;
         } );
+        get( "/admin/results.html",
+            ( req, res ) ->
+                hbRouteFactory.fromJpa(
+                        "admin/results",
+                        entityManager ->
+                            ResultsModelBuilder.getResultsModelFromEntityManager(
+                                entityManager,
+                                isBlank( req.queryParams( "matchId" ) ) ?
+                                    null :
+                                    UUID.fromString ( req.queryParams( "matchId" ) ) ) )
+                    .handle( req, res ) );
+        post( "/admin/addResults", ( req, res ) ->
+        {
+            final Mutable<UUID> seasonId = new MutableObject<>();
+            RunAgainstDatabase.run( entityManagerFactory, entityManager ->
+            {
+                final Match match =
+                    requireNonNull( entityManager.find(
+                        Match.class,
+                        UUID.fromString( req.queryParams( "matchId" ) ) ) );
+                seasonId.setValue( match.getSeason().getSeasonId() );
+
+                final MatchTeam homeMatchTeam = match.getHomeMatchTeam();
+                final MatchTeam awayMatchTeam = match.getAwayMatchTeam();
+
+                homeMatchTeam.getGoals().forEach( entityManager::remove );
+                homeMatchTeam.getGoldenBallVotes().forEach( entityManager::remove );
+                homeMatchTeam.getMatchTeamPlayers().forEach( entityManager::remove );
+                awayMatchTeam.getGoals().forEach( entityManager::remove );
+                awayMatchTeam.getGoldenBallVotes().forEach( entityManager::remove );
+                awayMatchTeam.getMatchTeamPlayers().forEach( entityManager::remove );
+
+                entityManager.flush();
+
+                final Supplier<Integer> homeMatchTeamPlayerNumberSupplier =
+                    IntStream.iterate( 1, i -> i + 1 ).boxed().iterator()::next;
+                final Supplier<Integer> awayMatchTeamPlayerNumberSupplier =
+                    IntStream.iterate( 1, i -> i + 1 ).boxed().iterator()::next;
+
+                for( int i = 0; true; i++ )
+                {
+                    recordPlayerData( req.queryParams( "homePlayer" + i + "Id" ),
+                                      req.queryParams( "homePlayer" + i + "Present" ),
+                                      req.queryParams( "homePlayer" + i + "Votes" ),
+                                      req.queryParams( "homePlayer" + i + "Goals" ),
+                                      homeMatchTeamPlayerNumberSupplier,
+                                      homeMatchTeam,
+                                      entityManager );
+
+                    recordPlayerData( req.queryParams( "awayPlayer" + i + "Id" ),
+                                      req.queryParams( "awayPlayer" + i + "Present" ),
+                                      req.queryParams( "awayPlayer" + i + "Votes" ),
+                                      req.queryParams( "awayPlayer" + i + "Goals" ),
+                                      awayMatchTeamPlayerNumberSupplier,
+                                      awayMatchTeam,
+                                      entityManager );
+
+                    if( isBlank( req.queryParams( "homePlayer" + i + "Id" ) ) &&
+                        isBlank( req.queryParams( "awayPlayer" + i + "Id" ) ) )
+                    {
+                        break;
+                    }
+                }
+
+                Stream.of( Pair.of( "home", homeMatchTeam ),
+                           Pair.of( "away", awayMatchTeam ) )
+                    .forEach( pair ->
+                    {
+                        if( isNotBlank( req.queryParams( pair.getLeft() + "OpponentOwnGoals" ) ) )
+                        {
+                            final int goals =
+                                parseInt( req.queryParams( pair.getLeft() + "OpponentOwnGoals" ) );
+                            if( goals < 0 )
+                            {
+                                throw new IllegalArgumentException(
+                                    "Goals must be non-negative, was " + goals );
+                            }
+
+                            for( int i = 0; i < goals; i++ )
+                            {
+                                final Goal goal = new Goal();
+                                goal.setMatchTeam( pair.getRight() );
+                                goal.setOpponentOwnGoal( true );
+                                entityManager.persist( goal );
+                            }
+                        }
+                    } );
+                match.setStatusCode( MatchStatusCode.COMPLETED );
+            } );
+            res.redirect( "/admin/matches.html?seasonId=" +
+                              UrlCodecUtils.encode( seasonId.getValue().toString() ) );
+            return null;
+        } );
         get( "/*", new StaticContentRoute() );
+    }
+
+    private static void recordPlayerData( final String playerIdString,
+                                          final String playerPresentString,
+                                          final String playerVotesString,
+                                          final String playerGoalsString,
+                                          final Supplier<Integer> matchTeamPlayerNumberSupplier,
+                                          final MatchTeam matchTeam,
+                                          final EntityManager entityManager )
+    {
+        final UUID homePlayerId =
+            isBlank( playerIdString ) ? null : UUID.fromString( playerIdString );
+        if( homePlayerId != null && toBoolean( playerPresentString ) )
+        {
+            final Player player = entityManager.find( Player.class, homePlayerId );
+
+            final MatchTeamPlayer matchTeamPlayer = new MatchTeamPlayer();
+            matchTeamPlayer.setPlayer( player );
+            matchTeamPlayer.setMatchTeam( matchTeam );
+            matchTeamPlayer.setTeam( matchTeam.getTeam() );
+            matchTeamPlayer.setMatchTeamPlayerNumber(
+                matchTeamPlayerNumberSupplier.get() );
+            entityManager.persist( matchTeamPlayer );
+
+            if( isNotBlank( playerVotesString ) )
+            {
+                final int votes = parseInt( playerVotesString );
+                if( votes < 0 || votes > 3 )
+                {
+                    throw new IllegalArgumentException(
+                        "Votes must be 1 to 3 inclusive, was " + votes );
+                }
+
+                if( votes != 0 )
+                {
+                    final GoldenBallVote goldenBallVote = new GoldenBallVote();
+                    goldenBallVote.setMatchTeam( matchTeam );
+                    goldenBallVote.setMatchTeamPlayer( matchTeamPlayer );
+                    goldenBallVote.setVotesNumber( votes );
+                    entityManager.persist( goldenBallVote );
+                }
+            }
+
+            if( isNotBlank( playerGoalsString ) )
+            {
+                final int goals = parseInt( playerGoalsString );
+                if( goals < 0 )
+                {
+                    throw new IllegalArgumentException(
+                        "Goals must be non-negative, was " + goals );
+                }
+
+                for( int i = 0; i < goals; i++ )
+                {
+                    final Goal goal = new Goal();
+                    goal.setMatchTeam( matchTeam );
+                    goal.setMatchTeamPlayer( matchTeamPlayer );
+                    goal.setOpponentOwnGoal( false );
+                    entityManager.persist( goal );
+                }
+            }
+        }
     }
 }

@@ -1,12 +1,36 @@
 package com.footballfours.model.admin.matches;
 
+import java.util.UUID;
+
 public class MatchModel
 {
+    private UUID myMatchId;
+    private boolean myComplete;
     private String myScheduledDateTimeString;
     private String myPlayedDateTimeString;
     private int myRoundNumber;
     private String myHomeTeam;
     private String myAwayTeam;
+
+    public UUID getMatchId()
+    {
+        return myMatchId;
+    }
+
+    public void setMatchId( final UUID matchId )
+    {
+        myMatchId = matchId;
+    }
+
+    public boolean isComplete()
+    {
+        return myComplete;
+    }
+
+    public void setComplete( final boolean complete )
+    {
+        myComplete = complete;
+    }
 
     public String getScheduledDateTimeString()
     {

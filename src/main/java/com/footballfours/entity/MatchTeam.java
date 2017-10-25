@@ -1,6 +1,9 @@
 package com.footballfours.entity;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -11,7 +14,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.SortComparator;
 
 import com.footballfours.entity.constant.MatchTeamTeamTypeCode;
 
@@ -25,6 +31,9 @@ public class MatchTeam
     private Match myMatch;
     private Round myRound;
     private Season mySeason;
+    private SortedSet<MatchTeamPlayer> myMatchTeamPlayers;
+    private Collection<Goal> myGoals;
+    private SortedSet<GoldenBallVote> myGoldenBallVotes;
 
     @Id
     @GeneratedValue
@@ -97,6 +106,81 @@ public class MatchTeam
     public void setSeason( final Season season )
     {
         mySeason = season;
+    }
+
+    public static class MatchTeamPlayerSortComparator implements Comparator<MatchTeamPlayer>
+    {
+        @Override
+        public int compare( final MatchTeamPlayer o1, final MatchTeamPlayer o2 )
+        {
+            if( o1 == null )
+            {
+                return o2 == null ? 0 : 1;
+            }
+
+            if( o2 == null )
+            {
+                return -1;
+            }
+
+            return Integer.compare( o1.getMatchTeamPlayerNumber(), o2.getMatchTeamPlayerNumber() );
+        }
+    }
+
+    @OneToMany( mappedBy = "matchTeam" )
+    @SortComparator( MatchTeamPlayerSortComparator.class )
+    public SortedSet<MatchTeamPlayer> getMatchTeamPlayers()
+    {
+        return myMatchTeamPlayers;
+    }
+
+    public void setMatchTeamPlayers( final SortedSet<MatchTeamPlayer> matchTeamPlayers )
+    {
+        myMatchTeamPlayers = matchTeamPlayers;
+    }
+
+    @OneToMany( mappedBy = "matchTeam" )
+    @SortComparator( MatchTeamPlayerSortComparator.class )
+    public Collection<Goal> getGoals()
+    {
+        return myGoals;
+    }
+
+    public void setGoals( final Collection<Goal> goals )
+    {
+        myGoals = goals;
+    }
+
+    public static class GoldenBallVoteSortComparator implements Comparator<GoldenBallVote>
+    {
+        @Override
+        public int compare( final GoldenBallVote o1, final GoldenBallVote o2 )
+        {
+            if( o1 == null )
+            {
+                return o2 == null ? 0 : 1;
+            }
+
+            if( o2 == null )
+            {
+                return -1;
+            }
+
+            // Descending order (NB. o2 and o1 reversed)
+            return Integer.compare( o2.getVotesNumber(), o1.getVotesNumber() );
+        }
+    }
+
+    @OneToMany( mappedBy = "matchTeam" )
+    @SortComparator( GoldenBallVoteSortComparator.class )
+    public SortedSet<GoldenBallVote> getGoldenBallVotes()
+    {
+        return myGoldenBallVotes;
+    }
+
+    public void setGoldenBallVotes( final SortedSet<GoldenBallVote> goldenBallVotes )
+    {
+        myGoldenBallVotes = goldenBallVotes;
     }
 
     @Override
