@@ -92,4 +92,4 @@ GROUP BY
     p.nm_given,
     p.nm_family,
     mtp.id_match_team_player
-ORDER BY r.no_round ASC, m.dt_played ASC, g.fl_opponent_own_goal ASC, p.nm_family ASC
+ORDER BY m.dt_played ASC, r.no_round ASC, g.fl_opponent_own_goal ASC, p.nm_family ASC
