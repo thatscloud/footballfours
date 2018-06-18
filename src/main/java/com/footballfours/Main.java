@@ -240,8 +240,8 @@ public class Main
              hbRouteFactory.from(
                  "tables",
                  TablesModelBuilder::getTablesFromConnection ) );
-        get( "/rulessummary.html",
-            hbRouteFactory.from( "rulessummary", c -> new Object() ) );
+        get( "/rules.html",
+            hbRouteFactory.from( "rules", c -> new Object() ) );
         get( "/admin", ( req, res ) ->
         {
             res.redirect( "/admin/index.html", 302 );
